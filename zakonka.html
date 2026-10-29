@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Murrieta Legal — База знаний для ИИ</title>
+<meta name="description" content="Интерактивная база законов и судебных толкований штата Сан-Андреас (Murrieta) для быстрого поиска и использования нейросетями.">
+<style>
+  :root {
+    --bg-grad: radial-gradient(1200px 800px at 10% 0%, #e8ecff 0%, #f5f5f7 40%, #f0e8ff 100%);
+    --sidebar-bg: rgba(255, 255, 255, 0.55);
+    --panel-bg: rgba(255, 255, 255, 0.7);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-hover: rgba(255, 255, 255, 0.95);
+    --border: rgba(0, 0, 0, 0.08);
+    --text: #1d1d1f;
+    --text-dim: #6e6e73;
+    --accent: #007aff;
+    --accent-soft: rgba(0, 122, 255, 0.12);
+    --danger: #ff3b30;
+    --danger-soft: rgba(255, 59, 48, 0.1);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08);
+  }
+  [data-theme="dark"] {
+    --bg-grad: radial-gradient(1200px 800px at 10% 0%, #1a1a2e 0%, #1c1c1e 40%, #2a1a2e 100%);
+    --sidebar-bg: rgba(30, 30, 32, 0.6);
+    --panel-bg: rgba(40, 40, 45, 0.7);
+    --card-bg: rgba(48, 48, 52, 0.75);
+    --card-hover: rgba(58, 58, 62, 0.9);
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #f5f5f7;
+    --text-dim: #a1a1a6;
+    --accent: #0a84ff;
+    --accent-soft: rgba(10, 132, 255, 0.18);
+    --danger: #ff453a;
+    --danger-soft: rgba(255, 69, 58, 0.15);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-grad);
+    background-attachment: fixed;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    transition: color 0.3s, background 0.3s;
+  }
+  .app { display: flex; height: 100vh; padding: 20px; gap: 16px; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 270px; flex-shrink: 0;
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .traffic { display: flex; gap: 8px; padding: 16px 20px 8px; }
+  .traffic span { width: 12px; height: 12px; border-radius: 50%; }
+  .traffic .r { background: #ff5f57; }
+  .traffic .y { background: #febc2e; }
+  .traffic .g { background: #28c840; }
+  .brand { padding: 4px 20px 20px; font-weight: 700; font-size: 15px; letter-spacing: -0.2px; }
+  .brand small { display: block; font-weight: 400; font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .nav { flex: 1; overflow-y: auto; padding: 0 10px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; margin-bottom: 4px; border-radius: 10px;
+    cursor: pointer; font-size: 13.5px; font-weight: 500;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--accent-soft); }
+  .nav-item.active {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.35);
+  }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item .count { margin-left: auto; font-size: 11px; opacity: 0.65; font-weight: 400; }
+  
+  .sidebar-footer {
+    padding: 12px; border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .btn-ai {
+    width: 100%; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    color: #fff; border: none; font-weight: 600; font-size: 13px;
+    cursor: pointer; transition: filter 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-family: inherit;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  }
+  .btn-ai:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-ai:active { transform: scale(0.97); }
+  
+  .footer-actions { display: flex; gap: 6px; }
+  .icon-btn {
+    flex: 1; height: 34px; border-radius: 10px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text); font-size: 14px; cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center;
+    font-family: inherit;
+  }
+  .icon-btn:hover { background: var(--accent-soft); }
+  .icon-btn:active { transform: scale(0.96); }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    background: var(--panel-bg);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    display: flex; flex-direction: column; overflow: hidden; min-width: 0;
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .search-wrap { flex: 1; position: relative; }
+  .search-wrap svg {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; color: var(--text-dim);
+  }
+  .search {
+    width: 100%; height: 38px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--card-bg);
+    color: var(--text); padding: 0 12px 0 36px;
+    font-size: 13.5px; font-family: inherit;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .btn-primary {
+    height: 38px; padding: 0 16px; border-radius: 10px;
+    background: var(--accent); color: #fff; border: none;
+    font-size: 13.5px; font-weight: 600; cursor: pointer;
+    transition: filter 0.15s, transform 0.1s;
+    display: flex; align-items: center; gap: 6px;
+    font-family: inherit; white-space: nowrap;
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  /* CONTENT */
+  .content { flex: 1; overflow-y: auto; padding: 20px; }
+  .content::-webkit-scrollbar { width: 10px; }
+  .content::-webkit-scrollbar-thumb {
+    background: var(--border); border-radius: 10px;
+    border: 3px solid transparent; background-clip: padding-box;
+  }
+  .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+
+  /* Семантические карточки для парсинга ИИ */
+  .card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: linear-gradient(90deg, var(--accent), #af52de);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .card:hover { background: var(--card-hover); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .card:hover::before { opacity: 1; }
+  .card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; line-height: 1.3; }
+  .card-preview {
+    font-size: 12.5px; color: var(--text-dim); line-height: 1.5;
+    overflow: hidden; display: -webkit-box;
+    -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-clamp: 3;
+  }
+  .card-meta {
+    font-size: 11px; color: var(--text-dim); margin-top: auto;
+    padding-top: 8px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+  }
+
+  .empty { text-align: center; padding: 80px 20px; color: var(--text-dim); }
+  .empty .icon { font-size: 56px; margin-bottom: 16px; opacity: 0.4; }
+  .empty h3 { font-size: 17px; margin-bottom: 8px; color: var(--text); }
+  .empty p { font-size: 13px; max-width: 400px; margin: 0 auto; line-height: 1.5; }
+
+  /* MODAL */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 20px; animation: fadeIn 0.2s ease;
+  }
+  .modal-backdrop.show { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--panel-bg);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid var(--border); border-radius: 18px;
+    box-shadow: var(--shadow-lg); width: 100%; max-width: 720px;
+    max-height: 90vh; display: flex; flex-direction: column;
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-header {
+    padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  .modal-body {
+    padding: 20px 24px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .field label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-dim); margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .field input, .field textarea {
+    width: 100%; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card-bg); color: var(--text);
+    padding: 10px 12px; font-size: 14px; font-family: inherit;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .field textarea {
+    min-height: 350px; resize: vertical; line-height: 1.6;
+    font-family: "SF Mono", Monaco, Menlo, monospace; font-size: 13px;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .modal-footer {
+    padding: 16px 24px 20px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; gap: 8px;
+  }
+  .btn-ghost {
+    height: 38px; padding: 0 16px; border-radius: 10px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text); font-size: 13.5px; font-weight: 500;
+    cursor: pointer; font-family: inherit; transition: background 0.15s;
+  }
+  .btn-ghost:hover { background: var(--accent-soft); }
+  .btn-ghost.danger { color: var(--danger); border-color: var(--danger-soft); }
+  .btn-ghost.danger:hover { background: var(--danger-soft); }
+  .btn-save {
+    height: 38px; padding: 0 20px; border-radius: 10px;
+    background: var(--accent); color: #fff; border: none;
+    font-size: 13.5px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: filter 0.15s, transform 0.1s;
+  }
+  .btn-save:hover { filter: brightness(1.1); }
+  .btn-save:active { transform: scale(0.97); }
+
+  /* TOAST */
+  .toast-container {
+    position: fixed; bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; gap: 8px; z-index: 200;
+  }
+  .toast {
+    background: var(--panel-bg);
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 18px; box-shadow: var(--shadow-lg);
+    font-size: 13.5px; font-weight: 500;
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 320px;
+  }
+  .toast.success { border-left: 4px solid #34c759; }
+  .toast.error { border-left: 4px solid var(--danger); }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 768px) {
+    .app { padding: 10px; gap: 10px; }
+    .sidebar { width: 220px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; max-height: 200px; flex-direction: row; align-items: center; }
+    .sidebar .brand, .traffic { display: none; }
+    .sidebar-footer { flex-direction: row; border: none; padding: 10px; }
+    .nav { display: flex; padding: 10px; overflow-x: auto; }
+    .nav-item { white-space: nowrap; }
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="traffic">
+        <span class="r"></span><span class="y"></span><span class="g"></span>
+      </div>
+      <div class="brand">
+        Murrieta Legal
+        <small>База знаний для ИИ</small>
+      </div>
+      
+      <!-- Семантическая навигация -->
+      <nav class="nav" id="nav">
+        <div class="nav-item active" data-section="laws">
+          <span class="icon">📖</span>
+          <span>Законы</span>
+          <span class="count" id="count-laws">0</span>
+        </div>
+        <div class="nav-item" data-section="interpretations">
+          <span class="icon">⚖️</span>
+          <span>Толкования</span>
+          <span class="count" id="count-interpretations">0</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <!-- Кнопка для копирования всей базы в Markdown для нейросети -->
+        <button class="btn-ai" id="btn-copy-ai" title="Скопировать всю базу текстом для ChatGPT/Claude">
+          📋 Скопировать для ИИ
+        </button>
+        <div class="footer-actions">
+          <button class="icon-btn" id="btn-theme" title="Сменить тему">🌗</button>
+          <button class="icon-btn" id="btn-export" title="Экспорт JSON">📤</button>
+          <button class="icon-btn" id="btn-import" title="Импорт JSON">📥</button>
+          <input type="file" id="import-file" accept=".json" style="display:none">
+        </div>
+      </div>
+    </aside>
+
+    <!-- Семантический тег main для парсинга -->
+    <main class="main">
+      <header class="topbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="text" class="search" id="search" placeholder="Быстрый поиск по базе...">
+        </div>
+        <button class="btn-primary" id="btn-new">
+          <span>+</span> Добавить
+        </button>
+      </header>
+      
+      <!-- Семантический контейнер -->
+      <div class="content" id="content"></div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">Новая запись</div>
+        <button class="icon-btn" id="modal-close" style="width:32px;flex:none;border:none;">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Название</label>
+          <input type="text" id="input-title" placeholder="Например: Статья 12.8 — Незаконный оборот оружия">
+        </div>
+        <div class="field">
+          <label>Содержание</label>
+          <textarea id="input-content" placeholder="Полный текст закона или толкования..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost danger" id="btn-delete" style="display:none">🗑 Удалить</button>
+        <div style="flex:1"></div>
+        <button class="btn-ghost" id="btn-cancel">Отмена</button>
+        <button class="btn-save" id="btn-save">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'murrieta-legal-v1';
+  const THEME_KEY = 'murrieta-legal-theme';
+
+  let state = {
+    section: 'laws',
+    data: { laws: [], interpretations: [] },
+    search: '',
+    editingId: null
+  };
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.laws && parsed.interpretations) return parsed;
+      }
+    } catch (e) {}
+    return { laws: [], interpretations: [] };
+  }
+  function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+  }
+
+  function loadTheme() {
+    const t = localStorage.getItem(THEME_KEY) || 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  }
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+  }
+
+  function uid() {
+    return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function toast(msg, type) {
+    const el = document.createElement('div');
+    el.className = 'toast ' + (type || '');
+    el.textContent = msg;
+    document.getElementById('toast-container').appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; }, 2400);
+    setTimeout(() => el.remove(), 2800);
+  }
+  function formatDate(ts) {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return d.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function render() {
+    document.getElementById('count-laws').textContent = state.data.laws.length;
+    document.getElementById('count-interpretations').textContent = state.data.interpretations.length;
+
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.section === state.section);
+    });
+
+    const content = document.getElementById('content');
+    const items = state.data[state.section] || [];
+    const q = state.search.trim().toLowerCase();
+    const filtered = q
+      ? items.filter(it =>
+          (it.title || '').toLowerCase().includes(q) ||
+          (it.content || '').toLowerCase().includes(q))
+      : items;
+
+    const titleText = state.section === 'laws' ? 'Законы' : 'Судебные толкования';
+    const subText = state.section === 'laws'
+      ? 'Кодексы и нормативные акты штата Сан-Андреас'
+      : 'Прецеденты и официальные разъяснения Верховного суда';
+
+    if (filtered.length === 0) {
+      content.innerHTML = `
+        <h1 class="page-title">${titleText}</h1>
+        <div class="page-sub">${subText}</div>
+        <div class="empty">
+          <div class="icon">${state.section === 'laws' ? '📖' : '⚖️'}</div>
+          <h3>${q ? 'Ничего не найдено' : 'Пока пусто'}</h3>
+          <p>${q ? 'Попробуй изменить поисковый запрос.' : 'Нажми «+ Добавить», чтобы создать первую запись.'}</p>
+        </div>`;
+      return;
+    }
+
+    // Семантические теги article и header для лучшего парсинга нейросетью
+    content.innerHTML = `
+      <h1 class="page-title">${titleText}</h1>
+      <div class="page-sub">${subText} · ${filtered.length} ${filtered.length === 1 ? 'запись' : 'записей'}</div>
+      <div class="grid">
+        ${filtered.map(it => `
+          <article class="card" data-id="${it.id}">
+            <h2 class="card-title">${escapeHtml(it.title || 'Без названия')}</h2>
+            <div class="card-preview">${escapeHtml((it.content || '').slice(0, 200))}</div>
+            <footer class="card-meta">
+              <span>${formatDate(it.updatedAt || it.createdAt)}</span>
+              <span>${(it.content || '').length} симв.</span>
+            </footer>
+          </article>
+        `).join('')}
+      </div>`;
+
+    content.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', () => openEdit(card.dataset.id));
+    });
+  }
+
+  const modalBackdrop = document.getElementById('modal-backdrop');
+  const modalTitle = document.getElementById('modal-title');
+  const inputTitle = document.getElementById('input-title');
+  const inputContent = document.getElementById('input-content');
+  const btnDelete = document.getElementById('btn-delete');
+
+  function openNew() {
+    state.editingId = null;
+    modalTitle.textContent = state.section === 'laws' ? 'Новый закон' : 'Новое толкование';
+    inputTitle.value = '';
+    inputContent.value = '';
+    btnDelete.style.display = 'none';
+    modalBackdrop.classList.add('show');
+    setTimeout(() => inputTitle.focus(), 100);
+  }
+
+  function openEdit(id) {
+    const item = (state.data[state.section] || []).find(x => x.id === id);
+    if (!item) return;
+    state.editingId = id;
+    modalTitle.textContent = state.section === 'laws' ? 'Редактировать закон' : 'Редактировать толкование';
+    inputTitle.value = item.title || '';
+    inputContent.value = item.content || '';
+    btnDelete.style.display = 'inline-block';
+    modalBackdrop.classList.add('show');
+    setTimeout(() => inputTitle.focus(), 100);
+  }
+
+  function closeModal() {
+    modalBackdrop.classList.remove('show');
+    state.editingId = null;
+  }
+
+  function saveItem() {
+    const title = inputTitle.value.trim();
+    const content = inputContent.value.trim();
+
+    if (!title) { toast('Укажи название', 'error'); inputTitle.focus(); return; }
+    if (!content) { toast('Добавь содержание', 'error'); inputContent.focus(); return; }
+
+    const now = Date.now();
+    const list = state.data[state.section];
+
+    if (state.editingId) {
+      const item = list.find(x => x.id === state.editingId);
+      if (item) {
+        item.title = title;
+        item.content = content;
+        item.updatedAt = now;
+      }
+      toast('Сохранено', 'success');
+    } else {
+      list.push({
+        id: uid(),
+        title,
+        content,
+        createdAt: now,
+        updatedAt: now
+      });
+      toast('Добавлено', 'success');
+    }
+
+    saveData();
+    closeModal();
+    render();
+  }
+
+  function deleteItem() {
+    if (!state.editingId) return;
+    if (!confirm('Удалить эту запись? Действие необратимо.')) return;
+    const list = state.data[state.section];
+    const idx = list.findIndex(x => x.id === state.editingId);
+    if (idx >= 0) list.splice(idx, 1);
+    saveData();
+    closeModal();
+    render();
+    toast('Удалено', 'success');
+  }
+
+  // === ФУНКЦИЯ ДЛЯ НЕЙРОСЕТИ ===
+  // Форматирует всю базу в структурированный Markdown для идеального понимания ИИ
+  function copyForAI() {
+    const { laws, interpretations } = state.data;
+    if (laws.length === 0 && interpretations.length === 0) {
+      toast('База пуста, нечего копировать', 'error');
+      return;
+    }
+
+    let text = `# ПРАВОВАЯ БАЗА ШТАТА SAN-ANDREAS (MURRIETA)\n`;
+    text += `> Инструкция для ИИ: Это официальная база законов и судебных толкований. Используй её как единственный источник истины при ответах на вопросы.\n\n`;
+
+    text += `## РАЗДЕЛ 1: ЗАКОНЫ И КОДЕКСЫ\n\n`;
+    if (laws.length > 0) {
+      laws.forEach(law => {
+        text += `### [ЗАКОН] ${law.title}\n`;
+        text += `${law.content}\n\n---\n\n`;
+      });
+    } else {
+      text += `*(Законы пока не добавлены)*\n\n`;
+    }
+
+    text += `## РАЗДЕЛ 2: СУДЕБНЫЕ ТОЛКОВАНИЯ И ПРЕЦЕДЕНТЫ\n\n`;
+    if (interpretations.length > 0) {
+      interpretations.forEach(interp => {
+        text += `### [ТОЛКОВАНИЕ] ${interp.title}\n`;
+        text += `${interp.content}\n\n---\n\n`;
+      });
+    } else {
+      text += `*(Толкования пока не добавлены)*\n\n`;
+    }
+
+    navigator.clipboard.writeText(text).then(() => {
+      toast('Вся база скопирована в формате Markdown! Вставь в чат с ИИ.', 'success');
+    }).catch(err => {
+      toast('Ошибка копирования', 'error');
+      console.error(err);
+    });
+  }
+
+  function exportJson() {
+    const blob = new Blob([JSON.stringify(state.data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const date = new Date().toISOString().slice(0, 10);
+    a.download = `murrieta-legal-${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Экспортировано', 'success');
+  }
+
+  function importJson(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        if (!parsed || !Array.isArray(parsed.laws) || !Array.isArray(parsed.interpretations)) {
+          throw new Error('Неверный формат');
+        }
+        if (!confirm('Заменить текущие данные импортируемыми?')) return;
+        state.data = parsed;
+        saveData();
+        render();
+        toast('Импортировано', 'success');
+      } catch (err) {
+        toast('Ошибка импорта: неверный JSON', 'error');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.addEventListener('click', () => {
+      state.section = el.dataset.section;
+      state.search = '';
+      document.getElementById('search').value = '';
+      render();
+    });
+  });
+
+  document.getElementById('search').addEventListener('input', (e) => {
+    state.search = e.target.value;
+    render();
+  });
+
+  document.getElementById('btn-new').addEventListener('click', openNew);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('btn-cancel').addEventListener('click', closeModal);
+  document.getElementById('btn-save').addEventListener('click', saveItem);
+  document.getElementById('btn-delete').addEventListener('click', deleteItem);
+  document.getElementById('btn-theme').addEventListener('click', toggleTheme);
+  document.getElementById('btn-copy-ai').addEventListener('click', copyForAI); // Кнопка для ИИ
+  document.getElementById('btn-export').addEventListener('click', exportJson);
+  document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-file').click());
+  document.getElementById('import-file').addEventListener('change', (e) => {
+    if (e.target.files[0]) importJson(e.target.files[0]);
+    e.target.value = '';
+  });
+
+  modalBackdrop.addEventListener('click', (e) => {
+    if (e.target === modalBackdrop) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('search').focus();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+      e.preventDefault();
+      openNew();
+    }
+    if (e.key === 'Escape' && modalBackdrop.classList.contains('show')) {
+      closeModal();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && modalBackdrop.classList.contains('show')) {
+      e.preventDefault();
+      saveItem();
+    }
+  });
+
+  loadTheme();
+  state.data = loadData();
+  render();
+})();
+</script>
+</body>
+</html>
