@@ -43,10 +43,7 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
 }
 
 /* Titlebar */
-.tb {
-  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-  border-bottom: 1px solid var(--line2); flex: none;
-}
+.tb { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line2); flex: none; }
 .lights { display: flex; gap: 8px; }
 .lights i { width: 12px; height: 12px; border-radius: 50%; display: block; }
 .lights i:nth-child(1) { background: var(--red); }
@@ -66,6 +63,8 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
 .ib.pri:hover { filter: brightness(1.1); color: #fff; }
 .ib.ai { background: var(--pur); border-color: transparent; color: #fff; }
 .ib.ai:hover { filter: brightness(1.1); color: #fff; }
+.ib.sync { background: #34c759; border-color: transparent; color: #fff; }
+.ib.sync:hover { filter: brightness(1.1); color: #fff; }
 
 /* Layout */
 .layout { flex: 1; display: grid; grid-template-columns: 240px 300px 1fr; min-height: 0; }
@@ -115,10 +114,7 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
 
 /* Detail */
 .detail { overflow-y: auto; min-height: 0; position: relative; background: var(--win); }
-.dhead {
-  position: sticky; top: 0; z-index: 5; padding: 24px 32px 16px;
-  background: linear-gradient(var(--win) 70%, transparent); backdrop-filter: blur(12px);
-}
+.dhead { position: sticky; top: 0; z-index: 5; padding: 24px 32px 16px; background: linear-gradient(var(--win) 70%, transparent); backdrop-filter: blur(12px); }
 .dhead .kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--acc); margin-bottom: 6px; }
 .dhead h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.25; }
 .dhead .meta { margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--ink3); }
@@ -136,10 +132,7 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
 .dbody h4 { font-size: 14px; font-weight: 700; margin: 20px 0 8px; color: var(--ink2); }
 .dbody ul, .dbody ol { margin: 0 0 16px; padding-left: 20px; }
 .dbody li { margin-bottom: 6px; line-height: 1.6; }
-.dbody blockquote {
-  margin: 0 0 16px; padding: 14px 16px; border-left: 3px solid var(--acc); border-radius: 0 var(--r3) var(--r3) 0;
-  background: var(--acc-soft); font-size: 13.5px; line-height: 1.6;
-}
+.dbody blockquote { margin: 0 0 16px; padding: 14px 16px; border-left: 3px solid var(--acc); border-radius: 0 var(--r3) var(--r3) 0; background: var(--acc-soft); font-size: 13.5px; line-height: 1.6; }
 .dbody code { font: 12px/1.5 ui-monospace, "SF Mono", Menlo, monospace; background: var(--line); padding: 2px 5px; border-radius: 4px; }
 .dbody b { font-weight: 650; }
 .dbody hr { border: 0; border-top: 1px solid var(--line2); margin: 28px 0; }
@@ -149,52 +142,24 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
 /* AI Prompt Section */
 .ai-panel { padding: 24px 32px; display: none; }
 .ai-panel.active { display: block; }
-.ai-box {
-  background: rgba(175, 82, 222, 0.08); border: 1px solid rgba(175, 82, 222, 0.2); border-radius: var(--r2);
-  padding: 20px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; line-height: 1.7;
-  color: var(--ink); white-space: pre-wrap; position: relative;
-}
-.ai-copy {
-  position: absolute; top: 12px; right: 12px; padding: 6px 12px; border-radius: 6px; border: 0;
-  background: var(--pur); color: #fff; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.15s;
-}
+.ai-box { background: rgba(175, 82, 222, 0.08); border: 1px solid rgba(175, 82, 222, 0.2); border-radius: var(--r2); padding: 20px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; line-height: 1.7; color: var(--ink); white-space: pre-wrap; position: relative; }
+.ai-copy { position: absolute; top: 12px; right: 12px; padding: 6px 12px; border-radius: 6px; border: 0; background: var(--pur); color: #fff; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.15s; }
 .ai-copy:hover { filter: brightness(1.1); }
 
 /* Modal */
-.ov {
-  position: fixed; inset: 0; z-index: 99; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
-  display: none; align-items: center; justify-content: center; padding: 24px; animation: fade 0.2s ease;
-}
+.ov { position: fixed; inset: 0; z-index: 99; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 24px; animation: fade 0.2s ease; }
 .ov.on { display: flex; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes pop { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
-.mo {
-  width: min(600px, 100%); max-height: 85vh; overflow-y: auto; background: var(--win);
-  backdrop-filter: blur(50px) saturate(180%); border: 1px solid var(--line); border-radius: var(--r);
-  box-shadow: var(--sh); padding: 24px; animation: pop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
-}
+.mo { width: min(600px, 100%); max-height: 85vh; overflow-y: auto; background: var(--win); backdrop-filter: blur(50px) saturate(180%); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--sh); padding: 24px; animation: pop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1); }
 .mo h3 { margin: 0 0 18px; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
 .f { margin-bottom: 14px; }
 .f label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; color: var(--ink2); margin-bottom: 6px; text-transform: uppercase; }
-.f input, .f select, .f textarea {
-  width: 100%; padding: 9px 12px; border-radius: var(--r3); border: 1px solid var(--line);
-  background: var(--pane); color: var(--ink); font: inherit; font-size: 13px; outline: none; transition: 0.15s;
-}
+.f input, .f select, .f textarea { width: 100%; padding: 9px 12px; border-radius: var(--r3); border: 1px solid var(--line); background: var(--pane); color: var(--ink); font: inherit; font-size: 13px; outline: none; transition: 0.15s; }
 .f textarea { min-height: 250px; font: 13px/1.6 ui-monospace, "SF Mono", Menlo, monospace; resize: vertical; }
 .f input:focus, .f select:focus, .f textarea:focus { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft); background: var(--win); }
-.tgs { display: flex; gap: 6px; flex-wrap: wrap; }
-.tgs label {
-  display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line);
-  background: var(--pane); font-size: 11px; font-weight: 600; cursor: pointer; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0; transition: 0.15s;
-}
-.tgs label:hover { border-color: var(--ink3); }
-.tgs input { display: none; }
-.tgs label:has(input:checked) { background: var(--acc); border-color: transparent; color: #fff; }
 .macts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line2); }
-.btn {
-  padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--pane);
-  color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s;
-}
+.btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--pane); color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s; }
 .btn:hover { border-color: var(--ink3); transform: translateY(-1px); }
 .btn:active { transform: scale(0.97); }
 .btn.pri { background: var(--acc); border-color: transparent; color: #fff; }
@@ -202,11 +167,7 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
 .btn.dgr { color: var(--red); }
 .btn.dgr:hover { border-color: var(--red); background: rgba(255, 59, 48, 0.1); }
 
-.toast {
-  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 200;
-  padding: 10px 18px; border-radius: 10px; background: var(--ink); color: var(--bg);
-  font-size: 13px; font-weight: 600; box-shadow: var(--sh); opacity: 0; pointer-events: none; transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-}
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 200; padding: 10px 18px; border-radius: 10px; background: var(--ink); color: var(--bg); font-size: 13px; font-weight: 600; box-shadow: var(--sh); opacity: 0; pointer-events: none; transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
 .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (max-width: 1000px) {
@@ -237,8 +198,7 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
     <h1>Murrieta Legal · AI Knowledge Base</h1>
     <div class="acts">
       <button class="ib" id="thmBtn" title="Тема (⌥T)">◐</button>
-      <button class="ib" id="expBtn" title="Экспорт JSON">↓</button>
-      <button class="ib" id="impBtn" title="Импорт JSON">↑</button>
+      <button class="ib" id="btn-cloud" title="Синхронизация с GitHub">☁️</button>
       <button class="ib ai" id="aiRuleBtn">🤖 Промт для ИИ</button>
       <button class="ib pri" id="newBtn">＋ Новая</button>
     </div>
@@ -254,20 +214,22 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
         </div>
       </div>
       <div>
-        <div class="slab">Юрисдикция / Тип</div>
+        <div class="slab">Фильтры по тегам</div>
         <div class="chips" id="chips">
           <div class="chip on" data-tag="all">Все</div>
           <div class="chip" data-tag="Федеральный">Федеральный</div>
           <div class="chip" data-tag="Региональный">Региональный</div>
           <div class="chip" data-tag="Уголовный">Уголовный [У]</div>
           <div class="chip" data-tag="Административный">Админ. [А]</div>
+          <div class="chip" data-tag="LSPD">LSPD</div>
+          <div class="chip" data-tag="Процесс">Процесс</div>
         </div>
       </div>
       <div style="margin-top:auto; font-size:11px; color:var(--ink3); line-height:1.5; padding:0 4px;">
         <b>Горячие клавиши:</b><br>
         <code style="background:var(--line);padding:1px 4px;border-radius:3px;">⌘K</code> Поиск<br>
         <code style="background:var(--line);padding:1px 4px;border-radius:3px;">⌘N</code> Новая запись<br>
-        Данные хранятся в браузере (localStorage).
+        <b>Синхронизация:</b> Настройте GitHub Token в кнопке ☁️.
       </div>
     </aside>
 
@@ -280,35 +242,37 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
     </section>
 
     <section class="detail" id="detailView">
+      <!-- Панель промта -->
       <div class="ai-panel" id="aiPanel">
         <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;letter-spacing:-0.4px;">🤖 Системный промт для ИИ</h2>
-        <p style="color:var(--ink2);font-size:13px;margin-bottom:16px;">Скопируй этот текст и вставь его в начало чата с любой нейросетью. Это заставит её отвечать строго по твоему шаблону, проверять юрисдикцию и не лить воду.</p>
+        <p style="color:var(--ink2);font-size:13px;margin-bottom:16px;">Скопируй этот текст в чат с нейросетью, чтобы она работала как профессиональный адвокат.</p>
         <div class="ai-box">
           <button class="ai-copy" onclick="copyAiPrompt()">Копировать</button>
-ТЫ — ЮРИДИЧЕСКИЙ ИИ-АССИСТЕНТ (ПОМОЩНИК ПРОКУРОРА). 
-ТВОЯ ЗАДАЧА: давать максимально точные, сухие и практичные ответы на основе предоставленной базы знаний.
+ТЫ — ОПЫТНЫЙ АДВОКАТ ШТАТА SAN-ANDREAS (RP-СЕРВЕР MURRIETA).
+ТВОЯ ЗАДАЧА: защита доверителя, поиск процессуальных нарушений и лазеек в обвинении.
 
-СТРОГИЙ ШАБЛОН ОТВЕТА (не отступай от него):
+СТРОГИЙ ШАБЛОН ОТВЕТА (не отступай):
 1. ВЕРДИКТ: [Да/Нет/Частично] + суть в 1-2 предложениях.
-2. ГОВОРИТЬ: Простое, человеческое объяснение ситуации (как для устного ответа на тесте или коллеге). Без канцеляризмов, но с сохранением юридического смысла.
-3. РАЗБОР: Сухой юридический анализ. 
-   - ШАГ 0: ВСЕГДА сначала проверяй юрисдикцию (Федеральный орган не применяет региональные статьи и наоборот).
-   - Далее: Объект, Объективная сторона (формальный/материальный состав?), Субъект, Субъективная сторона (форма вины).
-   - Укажи, были ли нарушены стадии применения силы или процессуальные нормы (правило Миранды, требование прекратить и т.д.).
-4. ИТОГ: Итоговая квалификация действий + точная ссылка на НПА (статья, глава, номер толкования ВС).
+2. ГОВОРИТЬ: Как объяснить это сотруднику LSPD/FIB на месте.
+3. РАЗБОР:
+   - Проверка юрисдикции (Федерал/Регионал).
+   - Состав (Объект, Субъект, Стороны). Был ли умысел?
+   - Стадии применения силы (требование -> сила -> спецсредства).
+   - Соблюдение Миранды, обыск, задержание.
+4. ИТОГ: Точная ссылка на УАК/ПК и прецеденты ВС.
 
-ЖЕСТКИЕ ЗАПРЕТЫ:
-- Никаких "да-да, нет-нет", извинений или воды.
-- Если в вопросе не хватает контекста, додумай его логически, исходя из судебной практики, и укажи это как допущение.
-- Не путай предмет и объект, субъект и субъективную сторону.
-- Помни: отсутствие одного элемента состава = отсутствие состава.
+ЖЕСТКИЕ ПРАВИЛА:
+- Никакой воды и канцеляризмов.
+- Если сотрудник нарушил процессуальный кодекс — требуй освобождения.
+- Используй только предоставленную базу знаний.
         </div>
       </div>
 
+      <!-- Контент -->
       <div id="articleContent" style="display:none;">
         <div class="dhead">
           <div class="kicker" id="dKicker">ЗАКОН</div>
-          <h2 id="dTitle">Название статьи</h2>
+          <h2 id="dTitle">Название</h2>
           <div class="meta" id="dMeta"></div>
         </div>
         <div class="dbody" id="dBody"></div>
@@ -324,6 +288,7 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
   </div>
 </div>
 
+<!-- Модалка создания/редактирования -->
 <div class="ov" id="modalOverlay">
   <div class="mo">
     <h3 id="moTitle">Новая запись</h3>
@@ -333,19 +298,22 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
     </div>
     <div class="f">
       <label>Заголовок</label>
-      <input type="text" id="moTitleInput" placeholder="Краткая суть (например: Ношение оружия за спиной)">
+      <input type="text" id="moTitleInput" placeholder="Краткая суть">
     </div>
     <div class="f">
       <label>Теги (через запятую)</label>
-      <input type="text" id="moTags" placeholder="Федеральный, Уголовный, Оружие, LSPD">
+      <input type="text" id="moTags" placeholder="Федеральный, Уголовный, LSPD">
     </div>
     <div class="f">
-      <label>Содержание (поддерживает Markdown: **жирный**, # заголовок, > цитата)</label>
-      <textarea id="moContent" placeholder="Текст статьи или толкования..."></textarea>
+      <label style="display:flex; justify-content:space-between;">
+        <span>Содержание (Markdown)</span>
+        <button class="btn" style="padding:2px 8px; font-size:10px;" onclick="smartParse()">✨ Умный разбор</button>
+      </label>
+      <textarea id="moContent" placeholder="Вставь огромный текст решения суда или закона, нажми 'Умный разбор'..."></textarea>
     </div>
     <div class="f">
       <label>Ссылки / Основания</label>
-      <input type="text" id="moRefs" placeholder="Например: ст. 24 гл. VIII Закона об оружии">
+      <input type="text" id="moRefs" placeholder="Например: ст. 24 Закона об оружии">
     </div>
     <div class="macts">
       <button class="btn dgr" id="moDelBtn" style="display:none;margin-right:auto;">Удалить</button>
@@ -355,99 +323,30 @@ body::after { width: 500px; height: 500px; background: radial-gradient(circle, #
   </div>
 </div>
 
-<input type="file" id="fileInput" accept="application/json" hidden>
-<div class="toast" id="toast">Скопировано!</div>
+<!-- Модалка синхронизации -->
+<div class="ov" id="syncOverlay">
+  <div class="mo">
+    <h3>Синхронизация с GitHub</h3>
+    <div class="f">
+      <label>GitHub Token (с доступом к gist)</label>
+      <input type="password" id="syncToken" placeholder="ghp_...">
+    </div>
+    <div class="f">
+      <label>Gist ID</label>
+      <input type="text" id="syncGist" placeholder="Оставьте пустым для создания нового">
+    </div>
+    <div class="macts">
+      <button class="btn" onclick="closeSync()">Закрыть</button>
+      <button class="btn pri" style="background:#34c759" onclick="uploadToGist()">📤 Сохранить в облако</button>
+      <button class="btn" onclick="downloadFromGist()">📥 Скачать из облака</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Готово!</div>
 
 <script>
-// ───────── ВСТРОЕННАЯ БАЗА ЗНАНИЙ (Извлечено из murrieta-legal-2026-10-29 (1).json) ─────────
-const SEED_DATA = [
-  {
-    id: "uak-12-8-1", type: "law", num: "Ст. 12.8.1 УАК", title: "Ношение оружия в открытом виде (за спиной/на ремне)",
-    tags: ["Региональный", "Административный", "Оружие", "LSPD", "LSSD"],
-    refs: "ч. 1, 3, 4 ст. 24 гл. VIII Закона об оружии; Постановление ВС №83 от 16.11.2024",
-    content: `**Санкция:** 20–30 суток административного ареста либо штраф до 10.000$; залог 3.000$.
-
-**Суть:** Ношение любых видов оружия, спецсредств и боеприпасов в открытом виде (в том числе за спиной или на оружейном ремне) на территории государственных структур или в общественных местах, совершенное вопреки положениям Закона "О регулировании оборота оружия".
-
-**Важно (Постановление ВС №83):**
-> Ношение оружия за спиной или на ремне в общественных местах **без его использования** влечёт привлечение к **административной** ответственности по ч. 1 ст. 8 гл. XII (12.8.1) УАК. 
-
-Сотрудники **не имеют права немедленно задерживать** человека. Они обязаны предъявить требование прекратить противоправные действия. Задержание допустимо только при невыполнении требования, игнорировании или повторном нарушении.
-
-*Исключение:* Кратковременное обнажение оружия (не более 5 сек) для проверки тех. состояния (дуло вниз, не на людей) не является нарушением.`
-  },
-  {
-    id: "interp-350", type: "interpretation", num: "Толкование ВС №350", title: "Юрисдикция FIB и работа по региональным статьям",
-    tags: ["Федеральный", "FIB", "Юрисдикция", "Процесс"],
-    refs: "Закон 'О Федеральном бюро расследований' [FIB]; ст. 15.1 УАК",
-    content: `**Суть:** Сотрудники FIB действуют исключительно в рамках федеральной юрисдикции. 
-
-**Ключевое правило:** Федеральные органы **не вправе** применять региональные административные или уголовные нормы штата (например, ст. 12.8.1 УАК, ст. 13.4 УАК) к гражданам, если деяние не посягает на федеральные интересы, федеральную собственность или федеральных служащих.
-
-**Последствия нарушения:** Если сотрудник FIB инициирует задержание или проверку, основываясь исключительно на нарушении регионального закона (например, "обоснуйте оружие за спиной" без федеральной составляющей), такое требование является незаконным. Неподчинение такому требованию не образует состава ст. 17.6 УАК. Действия сотрудника подлежат квалификации по **ст. 15.1 УАК** (Превышение должностных полномочий).`
-  },
-  {
-    id: "interp-362", type: "interpretation", num: "Толкование ВС №362", title: "Идентификация сотрудников силовых структур",
-    tags: ["Федеральный", "Региональный", "Идентификация", "Жетон", "ПК"],
-    refs: "Постановление ВС по обращению №362; ч. 2 ст. 1 гл. IX ПК",
-    content: `**Правило:** При любом обращении к гражданину или применении мер принуждения сотрудник **обязан** представиться и идентифицировать себя (предъявить жетон/нашивку/удостоверение).
-
-**Детали:**
-1. Жетон должен обеспечивать **однозначную идентификацию** носителя. Намеренное искажение инициалов или номеров недопустимо (влечет ст. 17.4.1 УАК).
-2. Если сотрудник действует анонимно или отказывается идентифицировать себя, его требования признаются **незаконными**, а гражданин вправе им не подчиняться.
-3. Доказательства, полученные в ходе действий без надлежащей идентификации, признаются **недопустимыми**.
-4. Обязанность предоставить не менее 10 секунд на выполнение требования не включает обязанность гласно отсчитывать время.`
-  },
-  {
-    id: "pc-ch9", type: "law", num: "Глава IX ПК", title: "Стадии применения силы",
-    tags: ["Федеральный", "Региональный", "Процесс", "Задержание"],
-    refs: "ч. 1.2.1, ч. 2, ч. 2.2, ч. 2.4 ст. 1 гл. IX (9) Процессуального кодекса",
-    content: `**Базовый принцип:** Госслужащий **обязан руководствоваться стадиями применения силы** последовательно. Пропуск стадии = незаконность последующих действий.
-
-1. **Оценка обстановки:** Есть ли основания для немедленного применения силы (ч. 1.2.1 - прямая угроза жизни)? Если нет → шаг 2.
-2. **Требование (ч. 2.2):** Устное требование прекратить противоправное деяние. *Обязательный шаг.* Формулировка "Обоснуйте..." или вопрос не являются требованием прекратить.
-3. **Физическое принуждение (ч. 2.4):** Допустимо только при невыполнении требования, игнорировании или активном сопротивлении.
-
-**Следствие нарушения:** Если сотрудник сразу применяет силу или задержание без требования (например, при ст. 17.3 или 12.6.1 УАК), задержание признается незаконным. Задержанный подлежит освобождению (п. «в» ст. 5 гл. II ПК), а сотрудник несет ответственность по ст. 15.6.1 или 15.1 УАК.`
-  },
-  {
-    id: "uak-17-3", type: "law", num: "Ст. 17.3 УАК", title: "Оскорбление представителя власти",
-    tags: ["Региональный", "Уголовный", "LSPD", "Этика"],
-    refs: "Ст. 17.3 УАК; Толкование ВС №468",
-    content: `**Санкция:** Штраф до 20.000$ либо лишение свободы до 1 года.
-
-**Суть:** Оскорбление, то есть унижение чести и достоинства представителя власти, выраженное в неприличной форме, совершенное при исполнении им своих должностных обязанностей.
-
-**Важно (Толкование №468):**
-Если сотрудник находится в форменной одежде с ведомственными знаками отличия (жетон, нашивка), его статус презюмируется (считается установленным). Отдельного доказывания того, что гражданин "знал" о статусе сотрудника, не требуется. Оскорбление в адрес такого лица автоматически квалифицируется как направленное против представителя власти.
-
-*Примечание:* Оскорбление не дает права на немедленное физическое задержание без соблюдения стадий применения силы (Глава IX ПК), если нет непосредственной угрозы.`
-  },
-  {
-    id: "law-weapon-24", type: "law", num: "Ст. 24 Закона об оружии", title: "Порядок ношения и изъятия оружия",
-    tags: ["Региональный", "Оружие", "Лизензия"],
-    refs: "Закон 'О регулировании оборота оружия, боеприпасов и спецсредств в штате Сан-Андреас'",
-    content: `**Ч. 1:** Открытое ношение оружия в пределах госучреждений предоставляется исключительно сотрудникам гос. силовых структур и USSS при исполнении.
-**Ч. 3:** Открытое ношение оружия (за спиной/на ремне) **вне** территорий госструктур и общественных мест разрешено гражданам при законном владении.
-**Ч. 4:** В общественных местах гражданам разрешено ношение оружия **только в кобуре** при наличии лицензии.
-
-**Полномочия по изъятию:** Уполномоченные сотрудники вправе проверять документы на оружие и изымать его при выявлении нарушений (отсутствие лицензии, просрочка, служебное оружие у гражданского, аннулирование лицензии).`
-  },
-  {
-    id: "interp-469", type: "interpretation", num: "Правило Миранды (Прецедент №469)", title: "Обязательное разъяснение прав при задержании",
-    tags: ["Федеральный", "Региональный", "Процесс", "Миранда"],
-    refs: "П. 2 ст. 15 Конституции; п. «а» ст. 7 гл. II ПК; Прецедент №469",
-    content: `Перед началом процессуальных действий (допрос, обыск) задержанному **обязательно** зачитываются 4 элемента:
-1. Право хранить молчание.
-2. Всё, что вы скажете, может и будет использовано против вас.
-3. Право на один телефонный звонок.
-4. Право на адвоката (включая разъяснение возможности его предоставления).
-
-**Последствия:** Показания, данные до разъяснения прав, являются **недопустимыми доказательствами**. Нарушение влечет освобождение задержанного и дисциплинарную ответственность сотрудника.`
-  }
-];
-
-// ───────── STATE & INIT ─────────
+// ───────── STATE ─────────
 let db = [];
 let currentFilter = 'all';
 let currentTag = 'all';
@@ -455,44 +354,91 @@ let searchQuery = '';
 let activeId = null;
 let editingId = null;
 
-function init() {
-  const saved = localStorage.getItem('murrieta_db');
+const KEY_DB = 'murrieta_db';
+const KEY_TOKEN = 'murrieta-gh-token';
+const KEY_GIST = 'murrieta-gh-gist';
+
+// Демо-данные
+const SEED_DATA = [
+  {
+    id: "uak-12-8-1", type: "law", num: "Ст. 12.8.1 УАК", title: "Ношение оружия в открытом виде",
+    tags: ["Региональный", "Административный", "Оружие", "LSPD"],
+    refs: "Постановление ВС №83",
+    content: `**Санкция:** 20–30 суток или штраф до 10.000$.\n\n**Суть:** Ношение оружия в открытом виде (за спиной/на ремне) в общественных местах.\n\n**Прецедент №83:** Задержание без предварительного требования прекратить нарушение — **незаконно**.`
+  }
+];
+
+// ───────── INIT & STORAGE ─────────
+async function init() {
+  const saved = localStorage.getItem(KEY_DB);
   if (saved) {
     db = JSON.parse(saved);
   } else {
     db = [...SEED_DATA];
     saveDb();
   }
-  renderNav();
+
+  // Автозагрузка из Gist, если есть токен
+  if (localStorage.getItem(KEY_TOKEN) && localStorage.getItem(KEY_GIST)) {
+    try { await downloadFromGist(true); } catch(e) { console.log('Оффлайн режим'); }
+  }
+
   renderList();
-  setupListeners();
   
-  // Check system theme
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.documentElement.setAttribute('data-theme', 'dark');
   }
 }
 
 function saveDb() {
-  localStorage.setItem('murrieta_db', JSON.stringify(db));
+  localStorage.setItem(KEY_DB, JSON.stringify(db));
+}
+
+// ───────── SMART PARSER ─────────
+function smartParse() {
+  const text = document.getElementById('moContent').value;
+  if (!text) return alert('Вставь текст для разбора!');
+
+  // 1. Ищем номер
+  const numMatch = text.match(/(?:Толкование|Прецедент|Решение|Постановление).*?№\s*(\d+)/i);
+  if (numMatch) document.getElementById('moNum').value = `№ ${numMatch[1]}`;
+
+  // 2. Ищем название (Имя v. Имя или суть)
+  const titleMatch = text.match(/([А-ЯA-Z][а-яa-z]+ [А-ЯA-Z][а-яa-z]+ v\. [А-ЯA-Z][а-яa-z]+ [А-ЯA-Z][а-яa-z]+)/i);
+  if (titleMatch) {
+    document.getElementById('moTitleInput').value = titleMatch[1];
+  } else {
+    // Если нет "v.", берем первый заголовок
+    const lines = text.split('\n').filter(l => l.trim().length > 0);
+    if (lines[0]) document.getElementById('moTitleInput').value = lines[0].slice(0, 50);
+  }
+
+  // 3. Вытаскиваем "Разъяснение"
+  const explanationMatch = text.match(/(Разъяснение по (?:прецеденту|толкованию):[\s\S]*)/i);
+  if (explanationMatch) {
+    // Оставляем только разъяснение, выделяем жирным
+    let clean = explanationMatch[1].replace('Разъяснение по прецеденту:', '### 📌 РАЗЪЯСНЕНИЕ ВЕРХОВНОГО СУДА:\n\n').replace('Разъяснение по толкованию:', '### 📌 РАЗЪЯСНЕНИЕ ВЕРХОВНОГО СУДА:\n\n');
+    document.getElementById('moContent').value = clean;
+    showToast('Извлечено главное разъяснение!');
+  } else {
+    showToast('Извлечен номер и название. Текст оставлен как есть.');
+  }
 }
 
 // ───────── RENDERING ─────────
-function renderNav() {
-  const nav = document.getElementById('nav');
-  // Keep static buttons, dynamic can be added here if needed
-}
-
 function getFilteredItems() {
   return db.filter(item => {
     const matchFilter = currentFilter === 'all' ? true : 
                         currentFilter === 'fav' ? item.fav : 
                         item.type === currentFilter;
-    const matchTag = currentTag === 'all' ? true : item.tags.some(t => t.includes(currentTag));
-    const matchSearch = searchQuery === '' ? true : 
-      (item.title.toLowerCase().includes(searchQuery) || 
-       item.num.toLowerCase().includes(searchQuery) || 
-       item.content.toLowerCase().includes(searchQuery));
+    const matchTag = currentTag === 'all' ? true : item.tags.some(t => t.toLowerCase().includes(currentTag.toLowerCase()));
+    
+    const q = searchQuery.toLowerCase();
+    const matchSearch = q === '' ? true : 
+      (item.title.toLowerCase().includes(q) || 
+       item.num.toLowerCase().includes(q) || 
+       item.content.toLowerCase().includes(q));
+       
     return matchFilter && matchTag && matchSearch;
   });
 }
@@ -502,7 +448,7 @@ function renderList() {
   const items = getFilteredItems();
   
   if (items.length === 0) {
-    list.innerHTML = '<div class="empty" style="padding:40px 20px;text-align:center;color:var(--ink3);font-size:13px;">Ничего не найдено</div>';
+    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--ink3);font-size:13px;">Ничего не найдено</div>';
     return;
   }
 
@@ -519,7 +465,6 @@ function renderList() {
 
 function selectItem(id) {
   activeId = id;
-  editingId = null;
   renderList();
   
   const item = db.find(i => i.id === id);
@@ -527,68 +472,98 @@ function selectItem(id) {
 
   document.getElementById('aiPanel').classList.remove('active');
   document.getElementById('articleContent').style.display = 'block';
-  
   document.getElementById('dKicker').textContent = item.type === 'interpretation' ? 'ТОЛКОВАНИЕ ВС' : 'ЗАКОН / КОДЕКС';
   document.getElementById('dTitle').textContent = item.title;
   
-  const metaHtml = item.tags.map(t => {
-    let cls = 'badge';
-    if (t.includes('Федеральный')) cls += ' f';
-    else if (t.includes('Региональный')) cls += ' r';
-    else if (t.includes('Уголовный')) cls += ' u';
-    else if (t.includes('Административный')) cls += ' a';
-    else cls += ' r'; // default
-    return `<span class="${cls}">${t}</span>`;
-  }).join('');
-  document.getElementById('dMeta').innerHTML = metaHtml + (item.refs ? `<span style="margin-left:8px;opacity:0.7">📎 ${item.refs}</span>` : '');
+  document.getElementById('dMeta').innerHTML = item.tags.map(t => `<span class="badge r">${t}</span>`).join('') + 
+    (item.refs ? `<span style="margin-left:8px;opacity:0.7">📎 ${item.refs}</span>` : '');
 
-  // Simple markdown parser for display
+  // Парсер Markdown (базовый)
   let html = item.content
+    .replace(/### (.*?)\n/g, '<h3>$1</h3>')
     .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim, '<h3>$1</h3>')
     .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
     .replace(/\n/g, '<br>');
     
   document.getElementById('dBody').innerHTML = html;
 
-  // Mobile: show detail
-  if (window.innerWidth <= 1000) {
-    document.getElementById('detailView').classList.add('on');
-  }
+  if (window.innerWidth <= 1000) document.getElementById('detailView').classList.add('on');
 }
 
 function toggleFav(id) {
   const item = db.find(i => i.id === id);
-  if (item) {
-    item.fav = !item.fav;
-    saveDb();
-    renderList();
-  }
+  if (item) { item.fav = !item.fav; saveDb(); renderList(); }
 }
 
-// ───────── AI PROMPT & COPY ─────────
+// ───────── AI COPY ─────────
 function copyForAI() {
   const item = db.find(i => i.id === activeId);
   if (!item) return;
-  
-  const text = `КОНТЕКСТ ИЗ БАЗЫ ЗНАНИЙ:
-Статья/Толкование: ${item.num}
-Название: ${item.title}
-Теги: ${item.tags.join(', ')}
-Содержание:
-${item.content}
-
-ВОПРОС/СИТУАЦИЯ: [ВСТАВЬ СЮДА СИТУАЦИЮ]
-
-Проанализируй ситуацию строго по шаблону: ВЕРДИКТ, ГОВОРИТЬ, РАЗБОР (с проверкой юрисдикции!), ИТОГ.`;
-
-  navigator.clipboard.writeText(text).then(() => showToast('Скопировано для ИИ!'));
+  const text = `ЗАКОН/ПРЕЦЕДЕНТ:\n${item.num} - ${item.title}\n\nСУТЬ:\n${item.content}\n\nСИТУАЦИЯ: [ВСТАВЬ СИТУАЦИЮ]`;
+  navigator.clipboard.writeText(text).then(() => showToast('Скопировано!'));
 }
 
 function copyAiPrompt() {
   const text = document.querySelector('.ai-box').innerText.replace('Копировать', '').trim();
-  navigator.clipboard.writeText(text).then(() => showToast('Системный промт скопирован!'));
+  navigator.clipboard.writeText(text).then(() => showToast('Промт скопирован!'));
+}
+
+// ───────── GITHUB SYNC ─────────
+function openSync() {
+  document.getElementById('syncToken').value = localStorage.getItem(KEY_TOKEN) || '';
+  document.getElementById('syncGist').value = localStorage.getItem(KEY_GIST) || '';
+  document.getElementById('syncOverlay').classList.add('on');
+}
+function closeSync() { document.getElementById('syncOverlay').classList.remove('on'); }
+
+async function uploadToGist() {
+  const token = document.getElementById('syncToken').value.trim();
+  const gistId = document.getElementById('syncGist').value.trim();
+  if (!token) return alert('Нужен токен!');
+
+  localStorage.setItem(KEY_TOKEN, token);
+  const url = gistId ? `https://api.github.com/gists/${gistId}` : 'https://api.github.com/gists';
+  const method = gistId ? 'PATCH' : 'POST';
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify({
+        description: 'Murrieta Legal Base', public: false,
+        files: { 'murrieta-legal.json': { content: JSON.stringify(db, null, 2) } }
+      })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    localStorage.setItem(KEY_GIST, data.id);
+    document.getElementById('syncGist').value = data.id;
+    showToast('Сохранено в облако GitHub!');
+    closeSync();
+  } catch (err) { alert('Ошибка: проверь токен!'); }
+}
+
+async function downloadFromGist(silent = false) {
+  const token = localStorage.getItem(KEY_TOKEN);
+  const gistId = localStorage.getItem(KEY_GIST);
+  if (!token || !gistId) {
+    if(!silent) alert('Нет данных для синхронизации.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://api.github.com/gists/${gistId}`, { headers: { 'Authorization': `token ${token}` } });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const parsed = JSON.parse(data.files['murrieta-legal.json'].content);
+    
+    if (parsed && Array.isArray(parsed)) {
+      db = parsed;
+      saveDb();
+      renderList();
+      if(!silent) { showToast('Данные загружены из GitHub!'); closeSync(); }
+    }
+  } catch (err) { if(!silent) alert('Ошибка загрузки (возможно, неверный токен).'); }
 }
 
 // ───────── MODAL & CRUD ─────────
@@ -599,7 +574,7 @@ function openModal(id = null) {
   
   if (id) {
     const item = db.find(i => i.id === id);
-    document.getElementById('moTitle').textContent = 'Редактировать запись';
+    document.getElementById('moTitle').textContent = 'Редактировать';
     document.getElementById('moNum').value = item.num;
     document.getElementById('moTitleInput').value = item.title;
     document.getElementById('moTags').value = item.tags.join(', ');
@@ -607,94 +582,38 @@ function openModal(id = null) {
     document.getElementById('moRefs').value = item.refs || '';
   } else {
     document.getElementById('moTitle').textContent = 'Новая запись';
-    document.getElementById('moNum').value = '';
-    document.getElementById('moTitleInput').value = '';
-    document.getElementById('moTags').value = '';
-    document.getElementById('moContent').value = '';
-    document.getElementById('moRefs').value = '';
+    ['moNum', 'moTitleInput', 'moTags', 'moContent', 'moRefs'].forEach(i => document.getElementById(i).value = '');
   }
 }
 
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('on');
-  editingId = null;
-}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('on'); editingId = null; }
 
 function saveItem() {
   const num = document.getElementById('moNum').value.trim();
   const title = document.getElementById('moTitleInput').value.trim();
-  const tagsStr = document.getElementById('moTags').value.trim();
+  const tags = document.getElementById('moTags').value.split(',').map(t => t.trim()).filter(Boolean);
   const content = document.getElementById('moContent').value.trim();
   const refs = document.getElementById('moRefs').value.trim();
 
-  if (!num || !title || !content) {
-    alert('Заполни название и содержание!');
-    return;
-  }
-
-  const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()) : ['Общее'];
+  if (!num || !title || !content) return alert('Заполни название и текст!');
 
   if (editingId) {
     const idx = db.findIndex(i => i.id === editingId);
     db[idx] = { ...db[idx], num, title, tags, content, refs };
   } else {
-    db.unshift({
-      id: 'custom-' + Date.now(),
-      type: 'law',
-      num, title, tags, content, refs,
-      fav: false
-    });
+    db.unshift({ id: 'custom-' + Date.now(), type: num.includes('№') ? 'interpretation' : 'law', num, title, tags, content, refs, fav: false });
   }
   
-  saveDb();
-  closeModal();
-  renderList();
+  saveDb(); 
+  closeModal(); 
+  renderList(); 
   if (editingId) selectItem(editingId);
   showToast('Сохранено!');
-}
-
-function deleteItem() {
-  if (editingId && confirm('Удалить эту запись?')) {
-    db = db.filter(i => i.id !== editingId);
-    saveDb();
-    closeModal();
-    activeId = null;
-    document.getElementById('articleContent').style.display = 'none';
-    renderList();
-    showToast('Удалено');
+  
+  // Автосохранение в облако, если есть токен
+  if (localStorage.getItem(KEY_TOKEN) && localStorage.getItem(KEY_GIST)) {
+    uploadToGist().catch(() => {});
   }
-}
-
-// ───────── EXPORT / IMPORT ─────────
-function exportData() {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
-  const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute("href", dataStr);
-  downloadAnchorNode.setAttribute("download", "murrieta-legal-backup.json");
-  document.body.appendChild(downloadAnchorNode);
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();
-  showToast('База экспортирована!');
-}
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if (Array.isArray(imported)) {
-        db = imported;
-        saveDb();
-        renderList();
-        showToast('База успешно импортирована!');
-      }
-    } catch (err) {
-      alert('Ошибка чтения JSON файла');
-    }
-  };
-  reader.readAsText(file);
 }
 
 // ───────── UTILS ─────────
@@ -705,80 +624,44 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('on'), 2000);
 }
 
-function setupListeners() {
-  // Theme
-  document.getElementById('thmBtn').addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-  });
+// ───────── LISTENERS ─────────
+document.getElementById('thmBtn').addEventListener('click', () => {
+  const c = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', c === 'dark' ? 'light' : 'dark');
+});
 
-  // Search
-  document.getElementById('searchInput').addEventListener('input', (e) => {
-    searchQuery = e.target.value.toLowerCase();
+document.getElementById('searchInput').addEventListener('input', (e) => { searchQuery = e.target.value; renderList(); });
+
+document.querySelectorAll('.nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    currentFilter = btn.dataset.filter;
     renderList();
   });
+});
 
-  // Filters
-  document.querySelectorAll('.nav button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('on'));
-      btn.classList.add('on');
-      currentFilter = btn.dataset.filter;
-      renderList();
-    });
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    chip.classList.add('on');
+    currentTag = chip.dataset.tag;
+    renderList();
   });
+});
 
-  document.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-      chip.classList.add('on');
-      currentTag = chip.dataset.tag;
-      renderList();
-    });
-  });
+document.getElementById('newBtn').addEventListener('click', () => openModal());
+document.getElementById('editBtn').addEventListener('click', () => openModal(activeId));
+document.getElementById('delBtn').addEventListener('click', () => { if(confirm('Удалить?')) { db = db.filter(i => i.id !== activeId); saveDb(); renderList(); document.getElementById('articleContent').style.display='none'; } });
+document.getElementById('moDelBtn').addEventListener('click', () => { if(confirm('Удалить?')) { db = db.filter(i => i.id !== editingId); saveDb(); closeModal(); renderList(); document.getElementById('articleContent').style.display='none'; } });
 
-  // Actions
-  document.getElementById('newBtn').addEventListener('click', () => openModal());
-  document.getElementById('editBtn').addEventListener('click', () => openModal(activeId));
-  document.getElementById('delBtn').addEventListener('click', () => deleteItem());
-  document.getElementById('moDelBtn').addEventListener('click', () => deleteItem());
-  
-  document.getElementById('expBtn').addEventListener('click', exportData);
-  document.getElementById('impBtn').addEventListener('click', () => document.getElementById('fileInput').click());
-  document.getElementById('fileInput').addEventListener('change', importData);
-
-  document.getElementById('aiRuleBtn').addEventListener('click', () => {
-    activeId = null;
-    renderList(); // clear selection
-    document.getElementById('articleContent').style.display = 'none';
-    document.getElementById('aiPanel').classList.add('active');
-    if (window.innerWidth <= 1000) {
-      document.getElementById('detailView').classList.add('on');
-    }
-  });
-
-  // Keyboard shortcuts
-  document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-      e.preventDefault();
-      document.getElementById('searchInput').focus();
-    }
-    if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
-      e.preventDefault();
-      openModal();
-    }
-    if ((e.altKey || e.metaKey) && e.key === 't') {
-      e.preventDefault();
-      document.getElementById('thmBtn').click();
-    }
-    if (e.key === 'Escape') {
-      closeModal();
-      if (window.innerWidth <= 1000) {
-        document.getElementById('detailView').classList.remove('on');
-      }
-    }
-  });
-}
+document.getElementById('btn-cloud').addEventListener('click', openSync);
+document.getElementById('aiRuleBtn').addEventListener('click', () => {
+  activeId = null; renderList();
+  document.getElementById('articleContent').style.display = 'none';
+  document.getElementById('aiPanel').classList.add('active');
+  if (window.innerWidth <= 1000) document.getElementById('detailView').classList.add('on');
+});
 
 // Start
 init();
