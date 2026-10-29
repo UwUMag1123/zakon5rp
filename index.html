@@ -1,777 +1,787 @@
 <!DOCTYPE html>
 <html lang="ru" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Murrieta Legal — База знаний</title>
-<meta name="description" content="Интерактивная база законов и судебных толкований штата Сан-Андреас (Murrieta).">
-<!-- Подключаем парсер Markdown -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Murrieta Legal · AI Knowledge Base</title>
 <style>
-  :root {
-    --bg-grad: radial-gradient(1200px 800px at 10% 0%, #e8ecff 0%, #f5f5f7 40%, #f0e8ff 100%);
-    --sidebar-bg: rgba(255, 255, 255, 0.55);
-    --panel-bg: rgba(255, 255, 255, 0.7);
-    --card-bg: rgba(255, 255, 255, 0.85);
-    --card-hover: rgba(255, 255, 255, 0.95);
-    --border: rgba(0, 0, 0, 0.08);
-    --text: #1d1d1f;
-    --text-dim: #6e6e73;
-    --accent: #007aff;
-    --accent-soft: rgba(0, 122, 255, 0.12);
-    --danger: #ff3b30;
-    --danger-soft: rgba(255, 59, 48, 0.1);
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
-    --shadow-lg: 0 20px 60px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08);
-  }
-  [data-theme="dark"] {
-    --bg-grad: radial-gradient(1200px 800px at 10% 0%, #1a1a2e 0%, #1c1c1e 40%, #2a1a2e 100%);
-    --sidebar-bg: rgba(30, 30, 32, 0.6);
-    --panel-bg: rgba(40, 40, 45, 0.7);
-    --card-bg: rgba(48, 48, 52, 0.75);
-    --card-hover: rgba(58, 58, 62, 0.9);
-    --border: rgba(255, 255, 255, 0.08);
-    --text: #f5f5f7;
-    --text-dim: #a1a1a6;
-    --accent: #0a84ff;
-    --accent-soft: rgba(10, 132, 255, 0.18);
-    --danger: #ff453a;
-    --danger-soft: rgba(255, 69, 58, 0.15);
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-    --shadow-lg: 0 20px 60px rgba(0,0,0,0.6);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; overflow: hidden; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-    background: var(--bg-grad); background-attachment: fixed; color: var(--text);
-    -webkit-font-smoothing: antialiased; transition: color 0.3s, background 0.3s;
-  }
-  .app { display: flex; height: 100vh; padding: 20px; gap: 16px; }
+:root {
+  --bg: #f5f5f7; --win: rgba(255, 255, 255, 0.75); --pane: rgba(255, 255, 255, 0.5);
+  --ink: #1d1d1f; --ink2: #6e6e73; --ink3: #86868b;
+  --line: rgba(0, 0, 0, 0.08); --line2: rgba(0, 0, 0, 0.04);
+  --acc: #0071e3; --acc-soft: rgba(0, 113, 227, 0.12);
+  --red: #ff3b30; --org: #ff9500; --grn: #34c759; --pur: #af52de;
+  --sh: 0 20px 40px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+  --r: 16px; --r2: 12px; --r3: 8px;
+}
+[data-theme="dark"] {
+  --bg: #000000; --win: rgba(30, 30, 30, 0.75); --pane: rgba(44, 44, 46, 0.5);
+  --ink: #f5f5f7; --ink2: #a1a1a6; --ink3: #6e6e73;
+  --line: rgba(255, 255, 255, 0.1); --line2: rgba(255, 255, 255, 0.05);
+  --acc: #0a84ff; --acc-soft: rgba(10, 132, 255, 0.2);
+  --sh: 0 20px 40px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  transition: background 0.4s ease, color 0.3s ease;
+  overflow: hidden;
+}
+body::before, body::after {
+  content: ""; position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; opacity: 0.4; pointer-events: none;
+}
+body::before { width: 600px; height: 600px; background: radial-gradient(circle, #5e5ce6, transparent 70%); top: -200px; left: -100px; }
+body::after { width: 500px; height: 500px; background: radial-gradient(circle, #30d158, transparent 70%); bottom: -150px; right: -100px; }
 
-  /* SIDEBAR */
-  .sidebar {
-    width: 270px; flex-shrink: 0;
-    background: var(--sidebar-bg);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 20px; border: 1px solid var(--border);
-    box-shadow: var(--shadow-md); display: flex; flex-direction: column; overflow: hidden;
-  }
-  .traffic { display: flex; gap: 8px; padding: 16px 20px 8px; }
-  .traffic span { width: 12px; height: 12px; border-radius: 50%; }
-  .traffic .r { background: #ff5f57; }
-  .traffic .y { background: #febc2e; }
-  .traffic .g { background: #28c840; }
-  .brand { padding: 4px 20px 20px; font-weight: 700; font-size: 15px; letter-spacing: -0.2px; }
-  .brand small { display: block; font-weight: 400; font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-  .nav { flex: 1; overflow-y: auto; padding: 0 10px; }
-  .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; margin-bottom: 4px; border-radius: 10px;
-    cursor: pointer; font-size: 13.5px; font-weight: 500;
-    transition: background 0.15s; user-select: none;
-  }
-  .nav-item:hover { background: var(--accent-soft); }
-  .nav-item.active { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(0, 122, 255, 0.35); }
-  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
-  .nav-item .count { margin-left: auto; font-size: 11px; opacity: 0.65; font-weight: 400; }
-  .sidebar-footer { padding: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
-  
-  .btn-ai {
-    width: 100%; height: 36px; border-radius: 10px;
-    background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; border: none; font-weight: 600; font-size: 13px;
-    cursor: pointer; transition: filter 0.15s, transform 0.1s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    font-family: inherit; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-  }
-  .btn-ai:hover { filter: brightness(1.1); transform: translateY(-1px); }
-  .btn-ai:active { transform: scale(0.97); }
-  
-  .footer-actions { display: flex; gap: 6px; }
-  .icon-btn {
-    flex: 1; height: 34px; border-radius: 10px;
-    background: transparent; border: 1px solid var(--border);
-    color: var(--text); font-size: 14px; cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    display: flex; align-items: center; justify-content: center; font-family: inherit;
-  }
-  .icon-btn:hover { background: var(--accent-soft); }
-  .icon-btn:active { transform: scale(0.96); }
+.win {
+  position: relative; z-index: 1; width: min(1300px, 100%); height: min(850px, calc(100vh - 40px));
+  background: var(--win); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-radius: var(--r); box-shadow: var(--sh); display: flex; flex-direction: column; overflow: hidden;
+}
 
-  /* MAIN */
-  .main {
-    flex: 1; background: var(--panel-bg);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 20px; border: 1px solid var(--border);
-    box-shadow: var(--shadow-md); display: flex; flex-direction: column; overflow: hidden; min-width: 0;
-  }
-  .topbar { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
-  .search-wrap { flex: 1; position: relative; }
-  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-dim); }
-  .search {
-    width: 100%; height: 38px; border-radius: 10px; border: 1px solid var(--border);
-    background: var(--card-bg); color: var(--text); padding: 0 12px 0 36px; font-size: 13.5px; font-family: inherit;
-    transition: border 0.2s, box-shadow 0.2s;
-  }
-  .search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  .btn-primary {
-    height: 38px; padding: 0 16px; border-radius: 10px;
-    background: var(--accent); color: #fff; border: none;
-    font-size: 13.5px; font-weight: 600; cursor: pointer;
-    transition: filter 0.15s, transform 0.1s;
-    display: flex; align-items: center; gap: 6px; font-family: inherit; white-space: nowrap;
-  }
-  .btn-primary:hover { filter: brightness(1.08); }
-  .btn-primary:active { transform: scale(0.97); }
+/* Titlebar */
+.tb {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border-bottom: 1px solid var(--line2); flex: none;
+}
+.lights { display: flex; gap: 8px; }
+.lights i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+.lights i:nth-child(1) { background: var(--red); }
+.lights i:nth-child(2) { background: var(--org); }
+.lights i:nth-child(3) { background: var(--grn); }
+.tb h1 { font-size: 13px; font-weight: 600; margin: 0; letter-spacing: -0.2px; color: var(--ink2); flex: 1; text-align: center; }
+.tb .acts { display: flex; gap: 6px; }
 
-  /* TAG FILTER BAR */
-  .tag-bar {
-    display: flex; gap: 8px; padding: 10px 20px; border-bottom: 1px solid var(--border);
-    overflow-x: auto; white-space: nowrap; scrollbar-width: none;
-  }
-  .tag-bar::-webkit-scrollbar { display: none; }
-  .tag-chip {
-    padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;
-    background: var(--card-bg); border: 1px solid var(--border); color: var(--text-dim);
-    cursor: pointer; transition: all 0.15s;
-  }
-  .tag-chip:hover { background: var(--accent-soft); color: var(--accent); }
-  .tag-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.ib {
+  height: 28px; min-width: 28px; padding: 0 10px; border-radius: var(--r3); border: 1px solid var(--line);
+  background: var(--pane); color: var(--ink2); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; transition: 0.15s;
+}
+.ib:hover { color: var(--ink); border-color: var(--ink3); transform: translateY(-1px); }
+.ib:active { transform: scale(0.96); }
+.ib.pri { background: var(--acc); border-color: transparent; color: #fff; }
+.ib.pri:hover { filter: brightness(1.1); color: #fff; }
+.ib.ai { background: var(--pur); border-color: transparent; color: #fff; }
+.ib.ai:hover { filter: brightness(1.1); color: #fff; }
 
-  /* CONTENT */
-  .content { flex: 1; overflow-y: auto; padding: 20px; }
-  .content::-webkit-scrollbar { width: 10px; }
-  .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; border: 3px solid transparent; background-clip: padding-box; }
-  .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 4px; }
-  .page-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+/* Layout */
+.layout { flex: 1; display: grid; grid-template-columns: 240px 300px 1fr; min-height: 0; }
 
-  .card {
-    background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 14px; padding: 16px; cursor: pointer;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 8px;
-    position: relative; overflow: hidden;
-  }
-  .card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--accent), #af52de); opacity: 0; transition: opacity 0.2s;
-  }
-  .card:hover { background: var(--card-hover); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .card:hover::before { opacity: 1; }
-  
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-  .card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; line-height: 1.3; }
-  .pin-btn { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.3; transition: opacity 0.2s, transform 0.1s; padding: 0; }
-  .pin-btn:hover { opacity: 1; transform: scale(1.1); }
-  .pin-btn.pinned { opacity: 1; }
-  
-  .card-preview {
-    font-size: 12.5px; color: var(--text-dim); line-height: 1.5;
-    overflow: hidden; display: -webkit-box;
-    -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-clamp: 3;
-  }
-  .card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-  .card-tag { font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-  
-  .card-meta {
-    font-size: 11px; color: var(--text-dim); margin-top: auto;
-    padding-top: 8px; border-top: 1px solid var(--border);
-    display: flex; justify-content: space-between;
-  }
+/* Sidebar */
+.side { border-right: 1px solid var(--line2); padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+.slab { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink3); margin-bottom: 8px; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav button {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 10px; border: 0; border-radius: var(--r3);
+  background: transparent; color: var(--ink); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; transition: 0.15s;
+}
+.nav button:hover { background: var(--line2); }
+.nav button.on { background: var(--acc); color: #fff; }
+.nav .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.dot.f { background: var(--pur); } .dot.r { background: var(--grn); } .dot.u { background: var(--red); } .dot.a { background: var(--org); }
 
-  .empty { text-align: center; padding: 80px 20px; color: var(--text-dim); }
-  .empty .icon { font-size: 56px; margin-bottom: 16px; opacity: 0.4; }
-  .empty h3 { font-size: 17px; margin-bottom: 8px; color: var(--text); }
-  .empty p { font-size: 13px; max-width: 400px; margin: 0 auto; line-height: 1.5; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--pane);
+  font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.15s; color: var(--ink2);
+}
+.chip:hover { transform: translateY(-1px); }
+.chip.on { background: var(--ink); color: var(--bg); border-color: transparent; }
 
-  /* MODAL */
-  .modal-backdrop {
-    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    display: none; align-items: center; justify-content: center;
-    z-index: 100; padding: 20px; animation: fadeIn 0.2s ease;
-  }
-  .modal-backdrop.show { display: flex; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .modal {
-    background: var(--panel-bg);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid var(--border); border-radius: 18px;
-    box-shadow: var(--shadow-lg); width: 100%; max-width: 760px;
-    max-height: 90vh; display: flex; flex-direction: column;
-    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  .modal-header {
-    padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .modal-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-  .modal-body { padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
-  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .field input, .field textarea {
-    width: 100%; border-radius: 10px; border: 1px solid var(--border);
-    background: var(--card-bg); color: var(--text); padding: 10px 12px; font-size: 14px; font-family: inherit;
-    transition: border 0.2s, box-shadow 0.2s;
-  }
-  .field textarea { min-height: 350px; resize: vertical; line-height: 1.6; font-family: "SF Mono", Monaco, Menlo, monospace; font-size: 13px; }
-  .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  
-  /* Markdown Preview Container */
-  .md-preview { 
-    padding: 15px; border: 1px solid var(--border); border-radius: 10px; 
-    background: var(--card-bg); min-height: 350px; font-size: 14px; line-height: 1.6;
-    overflow-y: auto;
-  }
-  .md-preview h1, .md-preview h2, .md-preview h3 { margin-bottom: 8px; margin-top: 16px; color: var(--accent); }
-  .md-preview p { margin-bottom: 12px; }
-  .md-preview ul, .md-preview ol { margin-left: 20px; margin-bottom: 12px; }
-  .md-preview li { margin-bottom: 4px; }
-  .md-preview strong { font-weight: 700; color: var(--text); }
-  .md-preview blockquote { border-left: 4px solid var(--accent); padding-left: 12px; color: var(--text-dim); margin-bottom: 12px; }
+/* List */
+.list { border-right: 1px solid var(--line2); display: flex; flex-direction: column; min-height: 0; }
+.search { padding: 12px; flex: none; position: relative; }
+.search input {
+  width: 100%; padding: 8px 12px 8px 30px; border-radius: var(--r3); border: 1px solid var(--line);
+  background: var(--pane); color: var(--ink); font: inherit; font-size: 13px; outline: none; transition: 0.2s;
+}
+.search svg { position: absolute; left: 22px; top: 21px; opacity: 0.4; width: 12px; height: 12px; }
+.search input:focus { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft); background: var(--win); }
+.items { flex: 1; overflow-y: auto; padding: 0 10px 14px; }
+.item {
+  padding: 10px 12px; border-radius: var(--r2); cursor: pointer; margin-bottom: 4px;
+  border: 1px solid transparent; transition: 0.15s; position: relative;
+}
+.item:hover { background: var(--pane); }
+.item.on { background: var(--win); border-color: var(--line); box-shadow: 0 4px 12px -6px rgba(0,0,0,0.2); }
+.item .t { font-size: 13px; font-weight: 600; letter-spacing: -0.2px; line-height: 1.3; margin-bottom: 4px; padding-right: 16px; }
+.item .m { font-size: 11px; color: var(--ink3); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.item .tg { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; background: var(--line); color: var(--ink2); letter-spacing: 0.3px; }
+.item .star { position: absolute; right: 10px; top: 10px; font-size: 12px; opacity: 0.2; transition: 0.15s; }
+.item.fav .star { opacity: 1; color: var(--org); }
 
-  .modal-footer { padding: 16px 24px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; gap: 8px; }
-  .btn-ghost {
-    height: 38px; padding: 0 16px; border-radius: 10px;
-    background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 13.5px; font-weight: 500;
-    cursor: pointer; font-family: inherit; transition: background 0.15s;
-  }
-  .btn-ghost:hover { background: var(--accent-soft); }
-  .btn-ghost.danger { color: var(--danger); border-color: var(--danger-soft); }
-  .btn-ghost.danger:hover { background: var(--danger-soft); }
-  .btn-save {
-    height: 38px; padding: 0 20px; border-radius: 10px;
-    background: var(--accent); color: #fff; border: none; font-size: 13.5px; font-weight: 600;
-    cursor: pointer; font-family: inherit; transition: filter 0.15s, transform 0.1s;
-  }
-  .btn-save:hover { filter: brightness(1.1); }
-  .btn-save:active { transform: scale(0.97); }
+/* Detail */
+.detail { overflow-y: auto; min-height: 0; position: relative; background: var(--win); }
+.dhead {
+  position: sticky; top: 0; z-index: 5; padding: 24px 32px 16px;
+  background: linear-gradient(var(--win) 70%, transparent); backdrop-filter: blur(12px);
+}
+.dhead .kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--acc); margin-bottom: 6px; }
+.dhead h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.25; }
+.dhead .meta { margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--ink3); }
+.badge { padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px; }
+.badge.f { background: rgba(175, 82, 222, 0.15); color: #8944c5; }
+.badge.r { background: rgba(52, 199, 89, 0.15); color: #1a8f34; }
+.badge.u { background: rgba(255, 59, 48, 0.15); color: #c42b1f; }
+.badge.a { background: rgba(255, 149, 0, 0.15); color: #b36800; }
+[data-theme="dark"] .badge.f { color: #bf6af2; } [data-theme="dark"] .badge.r { color: #30d158; }
+[data-theme="dark"] .badge.u { color: #ff453a; } [data-theme="dark"] .badge.a { color: #ff9f0a; }
 
-  /* TOAST */
-  .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 200; }
-  .toast {
-    background: var(--panel-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; box-shadow: var(--shadow-lg);
-    font-size: 13.5px; font-weight: 500; animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-width: 320px;
-  }
-  .toast.success { border-left: 4px solid #34c759; }
-  .toast.error { border-left: 4px solid var(--danger); }
-  @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.dbody { padding: 0 32px 60px; max-width: 800px; }
+.dbody p { margin: 0 0 14px; line-height: 1.65; }
+.dbody h3 { font-size: 16px; font-weight: 700; margin: 28px 0 12px; letter-spacing: -0.2px; }
+.dbody h4 { font-size: 14px; font-weight: 700; margin: 20px 0 8px; color: var(--ink2); }
+.dbody ul, .dbody ol { margin: 0 0 16px; padding-left: 20px; }
+.dbody li { margin-bottom: 6px; line-height: 1.6; }
+.dbody blockquote {
+  margin: 0 0 16px; padding: 14px 16px; border-left: 3px solid var(--acc); border-radius: 0 var(--r3) var(--r3) 0;
+  background: var(--acc-soft); font-size: 13.5px; line-height: 1.6;
+}
+.dbody code { font: 12px/1.5 ui-monospace, "SF Mono", Menlo, monospace; background: var(--line); padding: 2px 5px; border-radius: 4px; }
+.dbody b { font-weight: 650; }
+.dbody hr { border: 0; border-top: 1px solid var(--line2); margin: 28px 0; }
+.refs { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line2); font-size: 12px; color: var(--ink3); line-height: 1.5; }
+.dacts { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
 
-  @media (max-width: 768px) {
-    .app { padding: 10px; gap: 10px; }
-    .sidebar { width: 220px; }
-    .grid { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 600px) {
-    .app { flex-direction: column; }
-    .sidebar { width: 100%; max-height: 200px; flex-direction: row; align-items: center; }
-    .sidebar .brand, .traffic { display: none; }
-    .sidebar-footer { flex-direction: row; border: none; padding: 10px; }
-    .nav { display: flex; padding: 10px; overflow-x: auto; }
-    .nav-item { white-space: nowrap; }
-  }
+/* AI Prompt Section */
+.ai-panel { padding: 24px 32px; display: none; }
+.ai-panel.active { display: block; }
+.ai-box {
+  background: rgba(175, 82, 222, 0.08); border: 1px solid rgba(175, 82, 222, 0.2); border-radius: var(--r2);
+  padding: 20px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; line-height: 1.7;
+  color: var(--ink); white-space: pre-wrap; position: relative;
+}
+.ai-copy {
+  position: absolute; top: 12px; right: 12px; padding: 6px 12px; border-radius: 6px; border: 0;
+  background: var(--pur); color: #fff; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.15s;
+}
+.ai-copy:hover { filter: brightness(1.1); }
+
+/* Modal */
+.ov {
+  position: fixed; inset: 0; z-index: 99; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center; padding: 24px; animation: fade 0.2s ease;
+}
+.ov.on { display: flex; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+.mo {
+  width: min(600px, 100%); max-height: 85vh; overflow-y: auto; background: var(--win);
+  backdrop-filter: blur(50px) saturate(180%); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: var(--sh); padding: 24px; animation: pop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.mo h3 { margin: 0 0 18px; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+.f { margin-bottom: 14px; }
+.f label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; color: var(--ink2); margin-bottom: 6px; text-transform: uppercase; }
+.f input, .f select, .f textarea {
+  width: 100%; padding: 9px 12px; border-radius: var(--r3); border: 1px solid var(--line);
+  background: var(--pane); color: var(--ink); font: inherit; font-size: 13px; outline: none; transition: 0.15s;
+}
+.f textarea { min-height: 250px; font: 13px/1.6 ui-monospace, "SF Mono", Menlo, monospace; resize: vertical; }
+.f input:focus, .f select:focus, .f textarea:focus { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft); background: var(--win); }
+.tgs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tgs label {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--pane); font-size: 11px; font-weight: 600; cursor: pointer; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0; transition: 0.15s;
+}
+.tgs label:hover { border-color: var(--ink3); }
+.tgs input { display: none; }
+.tgs label:has(input:checked) { background: var(--acc); border-color: transparent; color: #fff; }
+.macts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line2); }
+.btn {
+  padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--pane);
+  color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s;
+}
+.btn:hover { border-color: var(--ink3); transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+.btn.pri { background: var(--acc); border-color: transparent; color: #fff; }
+.btn.pri:hover { filter: brightness(1.1); color: #fff; }
+.btn.dgr { color: var(--red); }
+.btn.dgr:hover { border-color: var(--red); background: rgba(255, 59, 48, 0.1); }
+
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 200;
+  padding: 10px 18px; border-radius: 10px; background: var(--ink); color: var(--bg);
+  font-size: 13px; font-weight: 600; box-shadow: var(--sh); opacity: 0; pointer-events: none; transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 1000px) {
+  .layout { grid-template-columns: 200px 1fr; }
+  .detail { display: none; }
+  .detail.on { display: block; position: absolute; inset: 0; z-index: 20; background: var(--win); }
+}
+@media (max-width: 700px) {
+  body { padding: 0; }
+  .win { width: 100%; height: 100vh; border-radius: 0; border: 0; }
+  .layout { grid-template-columns: 1fr; }
+  .side { display: none; }
+  .detail { display: none; }
+  .detail.on { display: block; }
+  .dhead, .dbody, .ai-panel { padding-left: 18px; padding-right: 18px; }
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.5); background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
 </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></div>
-      <div class="brand">Murrieta Legal<small>База знаний для ИИ</small></div>
-      <nav class="nav" id="nav">
-        <div class="nav-item active" data-section="laws">
-          <span class="icon">📖</span><span>Законы</span><span class="count" id="count-laws">0</span>
+
+<div class="win">
+  <div class="tb">
+    <div class="lights"><i></i><i></i><i></i></div>
+    <h1>Murrieta Legal · AI Knowledge Base</h1>
+    <div class="acts">
+      <button class="ib" id="thmBtn" title="Тема (⌥T)">◐</button>
+      <button class="ib" id="expBtn" title="Экспорт JSON">↓</button>
+      <button class="ib" id="impBtn" title="Импорт JSON">↑</button>
+      <button class="ib ai" id="aiRuleBtn">🤖 Промт для ИИ</button>
+      <button class="ib pri" id="newBtn">＋ Новая</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="side">
+      <div>
+        <div class="slab">Разделы</div>
+        <div class="nav" id="nav">
+          <button class="on" data-filter="all"><span class="dot" style="background:var(--ink)"></span> Все записи</button>
+          <button data-filter="fav"><span class="dot" style="background:var(--org)"></span> Избранное</button>
         </div>
-        <div class="nav-item" data-section="interpretations">
-          <span class="icon">⚖️</span><span>Толкования</span><span class="count" id="count-interpretations">0</span>
+      </div>
+      <div>
+        <div class="slab">Юрисдикция / Тип</div>
+        <div class="chips" id="chips">
+          <div class="chip on" data-tag="all">Все</div>
+          <div class="chip" data-tag="Федеральный">Федеральный</div>
+          <div class="chip" data-tag="Региональный">Региональный</div>
+          <div class="chip" data-tag="Уголовный">Уголовный [У]</div>
+          <div class="chip" data-tag="Административный">Админ. [А]</div>
         </div>
-      </nav>
-      <div class="sidebar-footer">
-        <button class="btn-ai" id="btn-copy-ai" title="Скопировать всю базу текстом для ИИ">📋 Скопировать для ИИ</button>
-        <div class="footer-actions">
-          <button class="icon-btn" id="btn-sync" title="Настройки синхронизации">⚙️ Облако</button>
-          <button class="icon-btn" id="btn-theme" title="Сменить тему">🌗</button>
-          <button class="icon-btn" id="btn-export" title="Экспорт JSON">📤</button>
-          <button class="icon-btn" id="btn-import" title="Импорт JSON">📥</button>
-          <input type="file" id="import-file" accept=".json" style="display:none">
-        </div>
+      </div>
+      <div style="margin-top:auto; font-size:11px; color:var(--ink3); line-height:1.5; padding:0 4px;">
+        <b>Горячие клавиши:</b><br>
+        <code style="background:var(--line);padding:1px 4px;border-radius:3px;">⌘K</code> Поиск<br>
+        <code style="background:var(--line);padding:1px 4px;border-radius:3px;">⌘N</code> Новая запись<br>
+        Данные хранятся в браузере (localStorage).
       </div>
     </aside>
 
-    <main class="main">
-      <header class="topbar">
-        <div class="search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
-          <input type="text" class="search" id="search" placeholder="Поиск по названию, тексту или тегам...">
-        </div>
-        <button class="btn-primary" id="btn-new"><span>+</span> Добавить</button>
-      </header>
-      
-      <!-- Панель тегов (динамическая) -->
-      <div class="tag-bar" id="tag-bar"></div>
+    <section class="list">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="searchInput" placeholder="Поиск по названию, номеру, тексту…" autocomplete="off">
+      </div>
+      <div class="items" id="itemsList"></div>
+    </section>
 
-      <div class="content" id="content"></div>
-    </main>
+    <section class="detail" id="detailView">
+      <div class="ai-panel" id="aiPanel">
+        <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;letter-spacing:-0.4px;">🤖 Системный промт для ИИ</h2>
+        <p style="color:var(--ink2);font-size:13px;margin-bottom:16px;">Скопируй этот текст и вставь его в начало чата с любой нейросетью. Это заставит её отвечать строго по твоему шаблону, проверять юрисдикцию и не лить воду.</p>
+        <div class="ai-box">
+          <button class="ai-copy" onclick="copyAiPrompt()">Копировать</button>
+ТЫ — ЮРИДИЧЕСКИЙ ИИ-АССИСТЕНТ (ПОМОЩНИК ПРОКУРОРА). 
+ТВОЯ ЗАДАЧА: давать максимально точные, сухие и практичные ответы на основе предоставленной базы знаний.
+
+СТРОГИЙ ШАБЛОН ОТВЕТА (не отступай от него):
+1. ВЕРДИКТ: [Да/Нет/Частично] + суть в 1-2 предложениях.
+2. ГОВОРИТЬ: Простое, человеческое объяснение ситуации (как для устного ответа на тесте или коллеге). Без канцеляризмов, но с сохранением юридического смысла.
+3. РАЗБОР: Сухой юридический анализ. 
+   - ШАГ 0: ВСЕГДА сначала проверяй юрисдикцию (Федеральный орган не применяет региональные статьи и наоборот).
+   - Далее: Объект, Объективная сторона (формальный/материальный состав?), Субъект, Субъективная сторона (форма вины).
+   - Укажи, были ли нарушены стадии применения силы или процессуальные нормы (правило Миранды, требование прекратить и т.д.).
+4. ИТОГ: Итоговая квалификация действий + точная ссылка на НПА (статья, глава, номер толкования ВС).
+
+ЖЕСТКИЕ ЗАПРЕТЫ:
+- Никаких "да-да, нет-нет", извинений или воды.
+- Если в вопросе не хватает контекста, додумай его логически, исходя из судебной практики, и укажи это как допущение.
+- Не путай предмет и объект, субъект и субъективную сторону.
+- Помни: отсутствие одного элемента состава = отсутствие состава.
+        </div>
+      </div>
+
+      <div id="articleContent" style="display:none;">
+        <div class="dhead">
+          <div class="kicker" id="dKicker">ЗАКОН</div>
+          <h2 id="dTitle">Название статьи</h2>
+          <div class="meta" id="dMeta"></div>
+        </div>
+        <div class="dbody" id="dBody"></div>
+        <div class="dbody">
+          <div class="dacts">
+            <button class="ib pri" onclick="copyForAI()">📋 Копировать для ИИ</button>
+            <button class="ib" id="editBtn">✏️ Редактировать</button>
+            <button class="ib dgr" id="delBtn">🗑 Удалить</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
+</div>
 
-  <!-- Модалка редактирования -->
-  <div class="modal-backdrop" id="modal-backdrop">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title" id="modal-title">Новая запись</div>
-        <button class="icon-btn" id="modal-close" style="width:32px;flex:none;border:none;">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="field">
-          <label>Название</label>
-          <input type="text" id="input-title" placeholder="Например: Статья 12.8 — Незаконный оборот оружия">
-        </div>
-        <div class="field">
-          <label>Теги (через запятую)</label>
-          <input type="text" id="input-tags" placeholder="УАК, 12.8, Оружие, LSPD">
-        </div>
-        <div class="field">
-          <label>Содержание (Поддерживает Markdown: **жирный**, - списки)</label>
-          <textarea id="input-content" placeholder="Полный текст закона или толкования..."></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-ghost danger" id="btn-delete" style="display:none">🗑 Удалить</button>
-        <div style="flex:1"></div>
-        <button class="btn-ghost" id="btn-cancel">Отмена</button>
-        <button class="btn-save" id="btn-save">Сохранить</button>
-      </div>
+<div class="ov" id="modalOverlay">
+  <div class="mo">
+    <h3 id="moTitle">Новая запись</h3>
+    <div class="f">
+      <label>Название / Номер статьи</label>
+      <input type="text" id="moNum" placeholder="Например: Ст. 12.8.1 УАК или Толкование №350">
+    </div>
+    <div class="f">
+      <label>Заголовок</label>
+      <input type="text" id="moTitleInput" placeholder="Краткая суть (например: Ношение оружия за спиной)">
+    </div>
+    <div class="f">
+      <label>Теги (через запятую)</label>
+      <input type="text" id="moTags" placeholder="Федеральный, Уголовный, Оружие, LSPD">
+    </div>
+    <div class="f">
+      <label>Содержание (поддерживает Markdown: **жирный**, # заголовок, > цитата)</label>
+      <textarea id="moContent" placeholder="Текст статьи или толкования..."></textarea>
+    </div>
+    <div class="f">
+      <label>Ссылки / Основания</label>
+      <input type="text" id="moRefs" placeholder="Например: ст. 24 гл. VIII Закона об оружии">
+    </div>
+    <div class="macts">
+      <button class="btn dgr" id="moDelBtn" style="display:none;margin-right:auto;">Удалить</button>
+      <button class="btn" onclick="closeModal()">Отмена</button>
+      <button class="btn pri" onclick="saveItem()">Сохранить</button>
     </div>
   </div>
+</div>
 
-  <!-- Модалка просмотра (Markdown) -->
-  <div class="modal-backdrop" id="view-backdrop">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title" id="view-title">Просмотр</div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn-ghost" id="btn-edit-from-view">✏️ Редактировать</button>
-          <button class="icon-btn" id="view-close" style="width:32px;flex:none;border:none;">✕</button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <div class="md-preview" id="view-content"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Модалка синхронизации -->
-  <div class="modal-backdrop" id="sync-backdrop">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">Синхронизация с GitHub (Gist)</div>
-        <button class="icon-btn" id="sync-close" style="width:32px;flex:none;border:none;">✕</button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size:13px; color:var(--text-dim); margin-bottom:10px;">
-          Создайте Personal Access Token (classic) в GitHub с галочкой <b>gist</b> и вставьте сюда. Токен сохранится только в вашем браузере.
-        </p>
-        <div class="field">
-          <label>GitHub Token</label>
-          <input type="password" id="sync-token" placeholder="ghp_...">
-        </div>
-        <div class="field">
-          <label>Gist ID (Оставьте пустым для создания нового)</label>
-          <input type="text" id="sync-gist-id" placeholder="Например: a1b2c3d4e5f6...">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-ghost" id="btn-cloud-download">📥 Скачать из облака</button>
-        <div style="flex:1"></div>
-        <button class="btn-save" id="btn-cloud-upload" style="background:#34c759;">📤 Сохранить в облако</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast-container" id="toast-container"></div>
+<input type="file" id="fileInput" accept="application/json" hidden>
+<div class="toast" id="toast">Скопировано!</div>
 
 <script>
-(function () {
-  'use strict';
+// ───────── ВСТРОЕННАЯ БАЗА ЗНАНИЙ (Извлечено из murrieta-legal-2026-10-29 (1).json) ─────────
+const SEED_DATA = [
+  {
+    id: "uak-12-8-1", type: "law", num: "Ст. 12.8.1 УАК", title: "Ношение оружия в открытом виде (за спиной/на ремне)",
+    tags: ["Региональный", "Административный", "Оружие", "LSPD", "LSSD"],
+    refs: "ч. 1, 3, 4 ст. 24 гл. VIII Закона об оружии; Постановление ВС №83 от 16.11.2024",
+    content: `**Санкция:** 20–30 суток административного ареста либо штраф до 10.000$; залог 3.000$.
 
-  const STORAGE_KEY = 'murrieta-legal-v1';
-  const THEME_KEY = 'murrieta-legal-theme';
-  const GH_TOKEN_KEY = 'murrieta-gh-token';
-  const GH_GIST_KEY = 'murrieta-gh-gist';
+**Суть:** Ношение любых видов оружия, спецсредств и боеприпасов в открытом виде (в том числе за спиной или на оружейном ремне) на территории государственных структур или в общественных местах, совершенное вопреки положениям Закона "О регулировании оборота оружия".
 
-  let state = {
-    section: 'laws',
-    data: { laws: [], interpretations: [] },
-    search: '',
-    activeTag: null,
-    editingId: null
+**Важно (Постановление ВС №83):**
+> Ношение оружия за спиной или на ремне в общественных местах **без его использования** влечёт привлечение к **административной** ответственности по ч. 1 ст. 8 гл. XII (12.8.1) УАК. 
+
+Сотрудники **не имеют права немедленно задерживать** человека. Они обязаны предъявить требование прекратить противоправные действия. Задержание допустимо только при невыполнении требования, игнорировании или повторном нарушении.
+
+*Исключение:* Кратковременное обнажение оружия (не более 5 сек) для проверки тех. состояния (дуло вниз, не на людей) не является нарушением.`
+  },
+  {
+    id: "interp-350", type: "interpretation", num: "Толкование ВС №350", title: "Юрисдикция FIB и работа по региональным статьям",
+    tags: ["Федеральный", "FIB", "Юрисдикция", "Процесс"],
+    refs: "Закон 'О Федеральном бюро расследований' [FIB]; ст. 15.1 УАК",
+    content: `**Суть:** Сотрудники FIB действуют исключительно в рамках федеральной юрисдикции. 
+
+**Ключевое правило:** Федеральные органы **не вправе** применять региональные административные или уголовные нормы штата (например, ст. 12.8.1 УАК, ст. 13.4 УАК) к гражданам, если деяние не посягает на федеральные интересы, федеральную собственность или федеральных служащих.
+
+**Последствия нарушения:** Если сотрудник FIB инициирует задержание или проверку, основываясь исключительно на нарушении регионального закона (например, "обоснуйте оружие за спиной" без федеральной составляющей), такое требование является незаконным. Неподчинение такому требованию не образует состава ст. 17.6 УАК. Действия сотрудника подлежат квалификации по **ст. 15.1 УАК** (Превышение должностных полномочий).`
+  },
+  {
+    id: "interp-362", type: "interpretation", num: "Толкование ВС №362", title: "Идентификация сотрудников силовых структур",
+    tags: ["Федеральный", "Региональный", "Идентификация", "Жетон", "ПК"],
+    refs: "Постановление ВС по обращению №362; ч. 2 ст. 1 гл. IX ПК",
+    content: `**Правило:** При любом обращении к гражданину или применении мер принуждения сотрудник **обязан** представиться и идентифицировать себя (предъявить жетон/нашивку/удостоверение).
+
+**Детали:**
+1. Жетон должен обеспечивать **однозначную идентификацию** носителя. Намеренное искажение инициалов или номеров недопустимо (влечет ст. 17.4.1 УАК).
+2. Если сотрудник действует анонимно или отказывается идентифицировать себя, его требования признаются **незаконными**, а гражданин вправе им не подчиняться.
+3. Доказательства, полученные в ходе действий без надлежащей идентификации, признаются **недопустимыми**.
+4. Обязанность предоставить не менее 10 секунд на выполнение требования не включает обязанность гласно отсчитывать время.`
+  },
+  {
+    id: "pc-ch9", type: "law", num: "Глава IX ПК", title: "Стадии применения силы",
+    tags: ["Федеральный", "Региональный", "Процесс", "Задержание"],
+    refs: "ч. 1.2.1, ч. 2, ч. 2.2, ч. 2.4 ст. 1 гл. IX (9) Процессуального кодекса",
+    content: `**Базовый принцип:** Госслужащий **обязан руководствоваться стадиями применения силы** последовательно. Пропуск стадии = незаконность последующих действий.
+
+1. **Оценка обстановки:** Есть ли основания для немедленного применения силы (ч. 1.2.1 - прямая угроза жизни)? Если нет → шаг 2.
+2. **Требование (ч. 2.2):** Устное требование прекратить противоправное деяние. *Обязательный шаг.* Формулировка "Обоснуйте..." или вопрос не являются требованием прекратить.
+3. **Физическое принуждение (ч. 2.4):** Допустимо только при невыполнении требования, игнорировании или активном сопротивлении.
+
+**Следствие нарушения:** Если сотрудник сразу применяет силу или задержание без требования (например, при ст. 17.3 или 12.6.1 УАК), задержание признается незаконным. Задержанный подлежит освобождению (п. «в» ст. 5 гл. II ПК), а сотрудник несет ответственность по ст. 15.6.1 или 15.1 УАК.`
+  },
+  {
+    id: "uak-17-3", type: "law", num: "Ст. 17.3 УАК", title: "Оскорбление представителя власти",
+    tags: ["Региональный", "Уголовный", "LSPD", "Этика"],
+    refs: "Ст. 17.3 УАК; Толкование ВС №468",
+    content: `**Санкция:** Штраф до 20.000$ либо лишение свободы до 1 года.
+
+**Суть:** Оскорбление, то есть унижение чести и достоинства представителя власти, выраженное в неприличной форме, совершенное при исполнении им своих должностных обязанностей.
+
+**Важно (Толкование №468):**
+Если сотрудник находится в форменной одежде с ведомственными знаками отличия (жетон, нашивка), его статус презюмируется (считается установленным). Отдельного доказывания того, что гражданин "знал" о статусе сотрудника, не требуется. Оскорбление в адрес такого лица автоматически квалифицируется как направленное против представителя власти.
+
+*Примечание:* Оскорбление не дает права на немедленное физическое задержание без соблюдения стадий применения силы (Глава IX ПК), если нет непосредственной угрозы.`
+  },
+  {
+    id: "law-weapon-24", type: "law", num: "Ст. 24 Закона об оружии", title: "Порядок ношения и изъятия оружия",
+    tags: ["Региональный", "Оружие", "Лизензия"],
+    refs: "Закон 'О регулировании оборота оружия, боеприпасов и спецсредств в штате Сан-Андреас'",
+    content: `**Ч. 1:** Открытое ношение оружия в пределах госучреждений предоставляется исключительно сотрудникам гос. силовых структур и USSS при исполнении.
+**Ч. 3:** Открытое ношение оружия (за спиной/на ремне) **вне** территорий госструктур и общественных мест разрешено гражданам при законном владении.
+**Ч. 4:** В общественных местах гражданам разрешено ношение оружия **только в кобуре** при наличии лицензии.
+
+**Полномочия по изъятию:** Уполномоченные сотрудники вправе проверять документы на оружие и изымать его при выявлении нарушений (отсутствие лицензии, просрочка, служебное оружие у гражданского, аннулирование лицензии).`
+  },
+  {
+    id: "interp-469", type: "interpretation", num: "Правило Миранды (Прецедент №469)", title: "Обязательное разъяснение прав при задержании",
+    tags: ["Федеральный", "Региональный", "Процесс", "Миранда"],
+    refs: "П. 2 ст. 15 Конституции; п. «а» ст. 7 гл. II ПК; Прецедент №469",
+    content: `Перед началом процессуальных действий (допрос, обыск) задержанному **обязательно** зачитываются 4 элемента:
+1. Право хранить молчание.
+2. Всё, что вы скажете, может и будет использовано против вас.
+3. Право на один телефонный звонок.
+4. Право на адвоката (включая разъяснение возможности его предоставления).
+
+**Последствия:** Показания, данные до разъяснения прав, являются **недопустимыми доказательствами**. Нарушение влечет освобождение задержанного и дисциплинарную ответственность сотрудника.`
+  }
+];
+
+// ───────── STATE & INIT ─────────
+let db = [];
+let currentFilter = 'all';
+let currentTag = 'all';
+let searchQuery = '';
+let activeId = null;
+let editingId = null;
+
+function init() {
+  const saved = localStorage.getItem('murrieta_db');
+  if (saved) {
+    db = JSON.parse(saved);
+  } else {
+    db = [...SEED_DATA];
+    saveDb();
+  }
+  renderNav();
+  renderList();
+  setupListeners();
+  
+  // Check system theme
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+}
+
+function saveDb() {
+  localStorage.setItem('murrieta_db', JSON.stringify(db));
+}
+
+// ───────── RENDERING ─────────
+function renderNav() {
+  const nav = document.getElementById('nav');
+  // Keep static buttons, dynamic can be added here if needed
+}
+
+function getFilteredItems() {
+  return db.filter(item => {
+    const matchFilter = currentFilter === 'all' ? true : 
+                        currentFilter === 'fav' ? item.fav : 
+                        item.type === currentFilter;
+    const matchTag = currentTag === 'all' ? true : item.tags.some(t => t.includes(currentTag));
+    const matchSearch = searchQuery === '' ? true : 
+      (item.title.toLowerCase().includes(searchQuery) || 
+       item.num.toLowerCase().includes(searchQuery) || 
+       item.content.toLowerCase().includes(searchQuery));
+    return matchFilter && matchTag && matchSearch;
+  });
+}
+
+function renderList() {
+  const list = document.getElementById('itemsList');
+  const items = getFilteredItems();
+  
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty" style="padding:40px 20px;text-align:center;color:var(--ink3);font-size:13px;">Ничего не найдено</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => `
+    <div class="item ${activeId === item.id ? 'on' : ''} ${item.fav ? 'fav' : ''}" onclick="selectItem('${item.id}')">
+      <div class="t">${item.num} · ${item.title}</div>
+      <div class="m">
+        ${item.tags.slice(0, 3).map(t => `<span class="tg">${t}</span>`).join('')}
+      </div>
+      <span class="star" onclick="event.stopPropagation(); toggleFav('${item.id}')">★</span>
+    </div>
+  `).join('');
+}
+
+function selectItem(id) {
+  activeId = id;
+  editingId = null;
+  renderList();
+  
+  const item = db.find(i => i.id === id);
+  if (!item) return;
+
+  document.getElementById('aiPanel').classList.remove('active');
+  document.getElementById('articleContent').style.display = 'block';
+  
+  document.getElementById('dKicker').textContent = item.type === 'interpretation' ? 'ТОЛКОВАНИЕ ВС' : 'ЗАКОН / КОДЕКС';
+  document.getElementById('dTitle').textContent = item.title;
+  
+  const metaHtml = item.tags.map(t => {
+    let cls = 'badge';
+    if (t.includes('Федеральный')) cls += ' f';
+    else if (t.includes('Региональный')) cls += ' r';
+    else if (t.includes('Уголовный')) cls += ' u';
+    else if (t.includes('Административный')) cls += ' a';
+    else cls += ' r'; // default
+    return `<span class="${cls}">${t}</span>`;
+  }).join('');
+  document.getElementById('dMeta').innerHTML = metaHtml + (item.refs ? `<span style="margin-left:8px;opacity:0.7">📎 ${item.refs}</span>` : '');
+
+  // Simple markdown parser for display
+  let html = item.content
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
+    .replace(/\n/g, '<br>');
+    
+  document.getElementById('dBody').innerHTML = html;
+
+  // Mobile: show detail
+  if (window.innerWidth <= 1000) {
+    document.getElementById('detailView').classList.add('on');
+  }
+}
+
+function toggleFav(id) {
+  const item = db.find(i => i.id === id);
+  if (item) {
+    item.fav = !item.fav;
+    saveDb();
+    renderList();
+  }
+}
+
+// ───────── AI PROMPT & COPY ─────────
+function copyForAI() {
+  const item = db.find(i => i.id === activeId);
+  if (!item) return;
+  
+  const text = `КОНТЕКСТ ИЗ БАЗЫ ЗНАНИЙ:
+Статья/Толкование: ${item.num}
+Название: ${item.title}
+Теги: ${item.tags.join(', ')}
+Содержание:
+${item.content}
+
+ВОПРОС/СИТУАЦИЯ: [ВСТАВЬ СЮДА СИТУАЦИЮ]
+
+Проанализируй ситуацию строго по шаблону: ВЕРДИКТ, ГОВОРИТЬ, РАЗБОР (с проверкой юрисдикции!), ИТОГ.`;
+
+  navigator.clipboard.writeText(text).then(() => showToast('Скопировано для ИИ!'));
+}
+
+function copyAiPrompt() {
+  const text = document.querySelector('.ai-box').innerText.replace('Копировать', '').trim();
+  navigator.clipboard.writeText(text).then(() => showToast('Системный промт скопирован!'));
+}
+
+// ───────── MODAL & CRUD ─────────
+function openModal(id = null) {
+  editingId = id;
+  document.getElementById('modalOverlay').classList.add('on');
+  document.getElementById('moDelBtn').style.display = id ? 'block' : 'none';
+  
+  if (id) {
+    const item = db.find(i => i.id === id);
+    document.getElementById('moTitle').textContent = 'Редактировать запись';
+    document.getElementById('moNum').value = item.num;
+    document.getElementById('moTitleInput').value = item.title;
+    document.getElementById('moTags').value = item.tags.join(', ');
+    document.getElementById('moContent').value = item.content;
+    document.getElementById('moRefs').value = item.refs || '';
+  } else {
+    document.getElementById('moTitle').textContent = 'Новая запись';
+    document.getElementById('moNum').value = '';
+    document.getElementById('moTitleInput').value = '';
+    document.getElementById('moTags').value = '';
+    document.getElementById('moContent').value = '';
+    document.getElementById('moRefs').value = '';
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('on');
+  editingId = null;
+}
+
+function saveItem() {
+  const num = document.getElementById('moNum').value.trim();
+  const title = document.getElementById('moTitleInput').value.trim();
+  const tagsStr = document.getElementById('moTags').value.trim();
+  const content = document.getElementById('moContent').value.trim();
+  const refs = document.getElementById('moRefs').value.trim();
+
+  if (!num || !title || !content) {
+    alert('Заполни название и содержание!');
+    return;
+  }
+
+  const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()) : ['Общее'];
+
+  if (editingId) {
+    const idx = db.findIndex(i => i.id === editingId);
+    db[idx] = { ...db[idx], num, title, tags, content, refs };
+  } else {
+    db.unshift({
+      id: 'custom-' + Date.now(),
+      type: 'law',
+      num, title, tags, content, refs,
+      fav: false
+    });
+  }
+  
+  saveDb();
+  closeModal();
+  renderList();
+  if (editingId) selectItem(editingId);
+  showToast('Сохранено!');
+}
+
+function deleteItem() {
+  if (editingId && confirm('Удалить эту запись?')) {
+    db = db.filter(i => i.id !== editingId);
+    saveDb();
+    closeModal();
+    activeId = null;
+    document.getElementById('articleContent').style.display = 'none';
+    renderList();
+    showToast('Удалено');
+  }
+}
+
+// ───────── EXPORT / IMPORT ─────────
+function exportData() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute("href", dataStr);
+  downloadAnchorNode.setAttribute("download", "murrieta-legal-backup.json");
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+  showToast('База экспортирована!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        db = imported;
+        saveDb();
+        renderList();
+        showToast('База успешно импортирована!');
+      }
+    } catch (err) {
+      alert('Ошибка чтения JSON файла');
+    }
   };
+  reader.readAsText(file);
+}
 
-  function loadData() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.laws && parsed.interpretations) return parsed;
-      }
-    } catch (e) {}
-    return { laws: [], interpretations: [] };
-  }
-  function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); }
+// ───────── UTILS ─────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2000);
+}
 
-  function loadTheme() {
-    const t = localStorage.getItem(THEME_KEY) || 'light';
-    document.documentElement.setAttribute('data-theme', t);
-  }
-  function toggleTheme() {
-    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem(THEME_KEY, next);
-  }
+function setupListeners() {
+  // Theme
+  document.getElementById('thmBtn').addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  });
 
-  function uid() { return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
-  
-  function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-  
-  function toast(msg, type) {
-    const el = document.createElement('div');
-    el.className = 'toast ' + (type || '');
-    el.textContent = msg;
-    document.getElementById('toast-container').appendChild(el);
-    setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; }, 2400);
-    setTimeout(() => el.remove(), 2800);
-  }
-  function formatDate(ts) {
-    if (!ts) return '';
-    return new Date(ts).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
+  // Search
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    searchQuery = e.target.value.toLowerCase();
+    renderList();
+  });
 
-  // === РЕНДЕР ===
-  function render() {
-    document.getElementById('count-laws').textContent = state.data.laws.length;
-    document.getElementById('count-interpretations').textContent = state.data.interpretations.length;
-
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.section === state.section));
-
-    // Сбор всех уникальных тегов для текущего раздела
-    const items = state.data[state.section] || [];
-    const allTags = new Set();
-    items.forEach(it => { if (it.tags) it.tags.forEach(t => allTags.add(t)); });
-    
-    // Рендер панели тегов
-    const tagBar = document.getElementById('tag-bar');
-    if (allTags.size > 0) {
-      tagBar.innerHTML = `<span style="font-size:11px; font-weight:600; color:var(--text-dim); padding:4px 8px;">Фильтр:</span>` + 
-        Array.from(allTags).map(t => 
-          `<div class="tag-chip ${state.activeTag === t ? 'active' : ''}" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</div>`
-        ).join('');
-      tagBar.style.display = 'flex';
-      tagBar.querySelectorAll('.tag-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          state.activeTag = state.activeTag === chip.dataset.tag ? null : chip.dataset.tag;
-          render();
-        });
-      });
-    } else {
-      tagBar.style.display = 'none';
-    }
-
-    // Фильтрация
-    const q = state.search.trim().toLowerCase();
-    let filtered = items.filter(it => {
-      const matchSearch = !q || (it.title || '').toLowerCase().includes(q) || (it.content || '').toLowerCase().includes(q);
-      const matchTag = !state.activeTag || (it.tags && it.tags.includes(state.activeTag));
-      return matchSearch && matchTag;
-    });
-
-    // Сортировка: сначала закрепленные, потом по дате
-    filtered.sort((a, b) => {
-      if (a.isPinned && !b.isPinned) return -1;
-      if (!a.isPinned && b.isPinned) return 1;
-      return (b.updatedAt || 0) - (a.updatedAt || 0);
-    });
-
-    const content = document.getElementById('content');
-    const titleText = state.section === 'laws' ? 'Законы' : 'Судебные толкования';
-
-    if (filtered.length === 0) {
-      content.innerHTML = `
-        <h1 class="page-title">${titleText}</h1>
-        <div class="empty">
-          <div class="icon">${state.section === 'laws' ? '📖' : '⚖️'}</div>
-          <h3>Ничего не найдено</h3>
-          <p>Измените запрос или добавьте новую запись.</p>
-        </div>`;
-      return;
-    }
-
-    content.innerHTML = `
-      <h1 class="page-title">${titleText}</h1>
-      <div class="page-sub">${filtered.length} записей</div>
-      <div class="grid">
-        ${filtered.map(it => `
-          <article class="card" data-id="${it.id}">
-            <div class="card-header">
-              <h2 class="card-title">${escapeHtml(it.title || 'Без названия')}</h2>
-              <button class="pin-btn ${it.isPinned ? 'pinned' : ''}" data-id="${it.id}" title="Закрепить">📌</button>
-            </div>
-            <div class="card-preview">${escapeHtml((it.content || '').replace(/[#*`_]/g, '').slice(0, 150))}...</div>
-            <div class="card-tags">
-              ${(it.tags || []).map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}
-            </div>
-            <footer class="card-meta">
-              <span>${formatDate(it.updatedAt || it.createdAt)}</span>
-            </footer>
-          </article>
-        `).join('')}
-      </div>`;
-
-    content.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('.pin-btn')) return; // Игнорируем клик по кнопке пина
-        openView(card.dataset.id);
-      });
-    });
-
-    content.querySelectorAll('.pin-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const item = state.data[state.section].find(x => x.id === btn.dataset.id);
-        if (item) {
-          item.isPinned = !item.isPinned;
-          saveData();
-          render();
-        }
-      });
-    });
-  }
-
-  // === МОДАЛКИ ===
-  const modalBackdrop = document.getElementById('modal-backdrop');
-  const viewBackdrop = document.getElementById('view-backdrop');
-  const syncBackdrop = document.getElementById('sync-backdrop');
-  
-  const inputTitle = document.getElementById('input-title');
-  const inputTags = document.getElementById('input-tags');
-  const inputContent = document.getElementById('input-content');
-  const btnDelete = document.getElementById('btn-delete');
-
-  function openNew() {
-    state.editingId = null;
-    document.getElementById('modal-title').textContent = state.section === 'laws' ? 'Новый закон' : 'Новое толкование';
-    inputTitle.value = ''; inputTags.value = ''; inputContent.value = '';
-    btnDelete.style.display = 'none';
-    modalBackdrop.classList.add('show');
-    setTimeout(() => inputTitle.focus(), 100);
-  }
-
-  function openEdit(id) {
-    const item = state.data[state.section].find(x => x.id === id);
-    if (!item) return;
-    state.editingId = id;
-    document.getElementById('modal-title').textContent = 'Редактировать';
-    inputTitle.value = item.title || '';
-    inputTags.value = (item.tags || []).join(', ');
-    inputContent.value = item.content || '';
-    btnDelete.style.display = 'inline-block';
-    viewBackdrop.classList.remove('show');
-    modalBackdrop.classList.add('show');
-  }
-
-  function openView(id) {
-    const item = state.data[state.section].find(x => x.id === id);
-    if (!item) return;
-    state.editingId = id;
-    document.getElementById('view-title').textContent = item.title;
-    document.getElementById('view-content').innerHTML = marked.parse(item.content || '*Пусто*');
-    document.getElementById('btn-edit-from-view').onclick = () => openEdit(id);
-    viewBackdrop.classList.add('show');
-  }
-
-  function closeModals() {
-    modalBackdrop.classList.remove('show');
-    viewBackdrop.classList.remove('show');
-    syncBackdrop.classList.remove('show');
-    state.editingId = null;
-  }
-
-  function saveItem() {
-    const title = inputTitle.value.trim();
-    const content = inputContent.value.trim();
-    const tagsRaw = inputTags.value.trim();
-    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
-
-    if (!title) { toast('Укажи название', 'error'); return; }
-    if (!content) { toast('Добавь содержание', 'error'); return; }
-
-    const now = Date.now();
-    const list = state.data[state.section];
-
-    if (state.editingId) {
-      const item = list.find(x => x.id === state.editingId);
-      if (item) {
-        item.title = title; item.content = content; item.tags = tags; item.updatedAt = now;
-      }
-    } else {
-      list.push({ id: uid(), title, content, tags, isPinned: false, createdAt: now, updatedAt: now });
-    }
-
-    saveData(); closeModals(); render(); toast('Сохранено', 'success');
-  }
-
-  function deleteItem() {
-    if (!state.editingId || !confirm('Удалить запись?')) return;
-    const idx = state.data[state.section].findIndex(x => x.id === state.editingId);
-    if (idx >= 0) state.data[state.section].splice(idx, 1);
-    saveData(); closeModals(); render(); toast('Удалено', 'success');
-  }
-
-  // === ЭКСПОРТ / ИМПОРТ / ИИ ===
-  function copyForAI() {
-    const { laws, interpretations } = state.data;
-    let text = `# БАЗА ЗНАНИЙ SAN-ANDREAS (MURRIETA)\n> Инструкция для ИИ: Это база законов и толкований.\n\n## ЗАКОНЫ\n`;
-    laws.forEach(l => { text += `### ${l.title}\nТеги: ${(l.tags||[]).join(', ')}\n\n${l.content}\n---\n`; });
-    text += `\n## ТОЛКОВАНИЯ\n`;
-    interpretations.forEach(i => { text += `### ${i.title}\nТеги: ${(i.tags||[]).join(', ')}\n\n${i.content}\n---\n`; });
-    
-    navigator.clipboard.writeText(text).then(() => toast('Скопировано! Вставьте в чат с ИИ.', 'success')).catch(() => toast('Ошибка копирования', 'error'));
-  }
-
-  function exportJson() {
-    const blob = new Blob([JSON.stringify(state.data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `murrieta-legal-${new Date().toISOString().slice(0,10)}.json`; a.click();
-    toast('Экспортировано', 'success');
-  }
-
-  function importJson(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const parsed = JSON.parse(e.target.result);
-        if (!parsed || !parsed.laws || !parsed.interpretations) throw new Error();
-        if (!confirm('Заменить данные?')) return;
-        state.data = parsed; saveData(); render(); toast('Импортировано', 'success');
-      } catch (err) { toast('Неверный файл', 'error'); }
-    };
-    reader.readAsText(file);
-  }
-
-  // === GITHUB GIST SYNC ===
-  function openSyncModal() {
-    document.getElementById('sync-token').value = localStorage.getItem(GH_TOKEN_KEY) || '';
-    document.getElementById('sync-gist-id').value = localStorage.getItem(GH_GIST_KEY) || '';
-    syncBackdrop.classList.add('show');
-  }
-
-  async function uploadToGist() {
-    const token = document.getElementById('sync-token').value.trim();
-    const gistId = document.getElementById('sync-gist-id').value.trim();
-    if (!token) return toast('Укажите GitHub Token', 'error');
-
-    localStorage.setItem(GH_TOKEN_KEY, token);
-    const url = gistId ? `https://api.github.com/gists/${gistId}` : 'https://api.github.com/gists';
-    const method = gistId ? 'PATCH' : 'POST';
-    
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
-        body: JSON.stringify({
-          description: 'Murrieta Legal Base',
-          public: false,
-          files: { 'murrieta-legal.json': { content: JSON.stringify(state.data, null, 2) } }
-        })
-      });
-      if (!res.ok) throw new Error('Ошибка API');
-      const data = await res.json();
-      
-      localStorage.setItem(GH_GIST_KEY, data.id);
-      document.getElementById('sync-gist-id').value = data.id;
-      toast('Успешно сохранено в облако!', 'success');
-    } catch (err) {
-      toast('Ошибка: проверьте токен', 'error');
-    }
-  }
-
-  async function downloadFromGist() {
-    const token = document.getElementById('sync-token').value.trim();
-    const gistId = document.getElementById('sync-gist-id').value.trim();
-    if (!token || !gistId) return toast('Укажите токен и Gist ID', 'error');
-
-    try {
-      const res = await fetch(`https://api.github.com/gists/${gistId}`, {
-        headers: { 'Authorization': `token ${token}` }
-      });
-      if (!res.ok) throw new Error('Ошибка API');
-      const data = await res.json();
-      
-      const content = data.files['murrieta-legal.json'].content;
-      const parsed = JSON.parse(content);
-      
-      if (!parsed.laws || !parsed.interpretations) throw new Error('Неверный формат');
-      if (!confirm('Заменить локальную базу данными из облака?')) return;
-      
-      state.data = parsed;
-      saveData(); render(); closeModals();
-      toast('Данные успешно скачаны!', 'success');
-    } catch (err) {
-      toast('Ошибка скачивания (неверный токен или ID)', 'error');
-    }
-  }
-
-  // === СОБЫТИЯ ===
-  document.querySelectorAll('.nav-item').forEach(el => {
-    el.addEventListener('click', () => {
-      state.section = el.dataset.section; state.search = ''; state.activeTag = null;
-      document.getElementById('search').value = ''; render();
+  // Filters
+  document.querySelectorAll('.nav button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      currentFilter = btn.dataset.filter;
+      renderList();
     });
   });
 
-  document.getElementById('search').addEventListener('input', (e) => { state.search = e.target.value; render(); });
-  document.getElementById('btn-new').addEventListener('click', openNew);
-  document.getElementById('btn-copy-ai').addEventListener('click', copyForAI);
-  
-  document.getElementById('modal-close').addEventListener('click', closeModals);
-  document.getElementById('btn-cancel').addEventListener('click', closeModals);
-  document.getElementById('btn-save').addEventListener('click', saveItem);
-  document.getElementById('btn-delete').addEventListener('click', deleteItem);
-  document.getElementById('view-close').addEventListener('click', closeModals);
-  
-  document.getElementById('btn-theme').addEventListener('click', toggleTheme);
-  document.getElementById('btn-export').addEventListener('click', exportJson);
-  document.getElementById('btn-import').addEventListener('click', () => document.getElementById('import-file').click());
-  document.getElementById('import-file').addEventListener('change', (e) => {
-    if (e.target.files[0]) importJson(e.target.files[0]); e.target.value = '';
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+      chip.classList.add('on');
+      currentTag = chip.dataset.tag;
+      renderList();
+    });
   });
 
-  // Модалка синхронизации
-  document.getElementById('btn-sync').addEventListener('click', openSyncModal);
-  document.getElementById('sync-close').addEventListener('click', closeModals);
-  document.getElementById('btn-cloud-upload').addEventListener('click', uploadToGist);
-  document.getElementById('btn-cloud-download').addEventListener('click', downloadFromGist);
+  // Actions
+  document.getElementById('newBtn').addEventListener('click', () => openModal());
+  document.getElementById('editBtn').addEventListener('click', () => openModal(activeId));
+  document.getElementById('delBtn').addEventListener('click', () => deleteItem());
+  document.getElementById('moDelBtn').addEventListener('click', () => deleteItem());
+  
+  document.getElementById('expBtn').addEventListener('click', exportData);
+  document.getElementById('impBtn').addEventListener('click', () => document.getElementById('fileInput').click());
+  document.getElementById('fileInput').addEventListener('change', importData);
 
-  // Закрытие модалок по клику на фон
-  [modalBackdrop, viewBackdrop, syncBackdrop].forEach(bd => {
-    bd.addEventListener('click', (e) => { if (e.target === bd) closeModals(); });
+  document.getElementById('aiRuleBtn').addEventListener('click', () => {
+    activeId = null;
+    renderList(); // clear selection
+    document.getElementById('articleContent').style.display = 'none';
+    document.getElementById('aiPanel').classList.add('active');
+    if (window.innerWidth <= 1000) {
+      document.getElementById('detailView').classList.add('on');
+    }
   });
 
-  // Горячие клавиши
+  // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('search').focus(); }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); openNew(); }
-    if (e.key === 'Escape') closeModals();
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && modalBackdrop.classList.contains('show')) { e.preventDefault(); saveItem(); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('searchInput').focus();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+      e.preventDefault();
+      openModal();
+    }
+    if ((e.altKey || e.metaKey) && e.key === 't') {
+      e.preventDefault();
+      document.getElementById('thmBtn').click();
+    }
+    if (e.key === 'Escape') {
+      closeModal();
+      if (window.innerWidth <= 1000) {
+        document.getElementById('detailView').classList.remove('on');
+      }
+    }
   });
+}
 
-  loadTheme(); state.data = loadData(); render();
-})();
+// Start
+init();
 </script>
 </body>
 </html>
