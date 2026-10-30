@@ -3,12 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Кодекс Murrieta — обновление загрузчика</title>
+<meta name="description" content="Полная законодательная база сервера Murrieta (GTA 5 RP)">
+<title>Кодекс Murrieta</title>
 </head>
 <body>
-<p>Временная заглушка — сейчас залью полный index.html отдельным коммитом.</p>
+<p style="font-family:sans-serif;padding:2rem">Загрузка… Если страница не открылась, залей полный <code>index.html</code> и папку <code>data/</code> из архива.</p>
 <script>
-location.replace(location.pathname.replace(/\/?$/, '/') + '#');
+fetch('docs.json').then(r=>r.json()).then(data=>{
+  document.body.innerHTML='<pre style="white-space:pre-wrap;font:14px/1.4 sans-serif">База загружена: '+data.length+' документов. Полный UI в архиве index.html</pre>';
+}).catch(e=>{
+  document.body.innerHTML='<p>docs.json ещё старый. Залей новый из архива (см. README).</p>';
+});
 </script>
 </body>
 </html>
