@@ -197,6 +197,8 @@ ul.docs a{display:block;padding:10px 2px;text-decoration:none;color:var(--ink);f
 ul.docs a:hover{color:var(--accent)}
 ul.docs .n{color:var(--ink-3);font-family:"JetBrains Mono",monospace;font-size:11px;
 margin-right:10px;display:inline-block;min-width:3.4em}
+ul.docs .path{font-family:"JetBrains Mono",monospace;font-size:9.5px;color:var(--ink-3);
+margin-left:8px;white-space:nowrap}
 h2{font-family:"JetBrains Mono",monospace;font-size:9.5px;text-transform:uppercase;
 letter-spacing:.18em;color:var(--ink-3);margin:36px 0 8px;display:flex;align-items:center;gap:8px}
 h2::before{content:"";width:5px;height:5px;background:var(--accent)}
@@ -511,7 +513,8 @@ def build_code_pages(doc, folder, short, mode, docs):
         items = refs.get(p["key"]) or []
         if items:
             links = "".join(
-                '<li><a href="%s%s.html">%s</a></li>' % (up, esc(d["id"]), esc(d["title"])) for d in items
+                '<li><a href="%s%s.html">%s</a> <span class="path">docs/%s.html</span></li>'
+                % (up, esc(d["id"]), esc(d["title"]), esc(d["id"])) for d in items
             )
             extra += '<h2>Где упоминается</h2>\n<ul class="docs">%s</ul>\n' % links
 
@@ -721,12 +724,47 @@ def build_appeal_nav(docs):
     )
 
 
+def build_map():
+    """Короткая карта базы: один запрос — и понятно, куда идти."""
+    text = "\n".join([
+        "КОДЕКС MURRIETA — КАРТА БАЗЫ",
+        "",
+        "94 документа. Все пути относительные от корня базы.",
+        "Ссылки внутри страниц тоже относительные: ../appeal-33.html со страницы docs/uak/12.8.html",
+        "означает docs/appeal-33.html.",
+        "",
+        "С ЧЕГО НАЧИНАТЬ",
+        "  docs/index.txt            все документы списком: id | раздел | название (18 КБ)",
+        "  docs/method-nav.html      методички по темам",
+        "  docs/precedent-nav.html   таблица «статья → толкование/прецедент»",
+        "  docs/appeal-nav.html      решения и толкования по номерам (№541 → документ)",
+        "  docs/casebook-1.html      разборы типовых казусов",
+        "",
+        "СТАТЬИ И ГЛАВЫ",
+        "  docs/uak/<номер>.html                УАК, например docs/uak/12.8.html",
+        "  docs/konst/<номер>.html              Конституция",
+        "  docs/trud/<номер>.html               Трудовой кодекс",
+        "  docs/pk/<глава>.html                 Процессуальный кодекс, например docs/pk/IX.html",
+        "  docs/sud/<глава>.html                Судебный кодекс",
+        "  docs/dor/<глава>.html                Дорожный кодекс",
+        "  docs/law/<номер>/index.html          закон по главам, например docs/law/20/index.html",
+        "  docs/prec/precedent-N/index.html     подборка прецедентов по частям",
+        "",
+        "ЧЕГО НЕ ДЕЛАТЬ",
+        "  index.html   — оболочка приложения: без выполнения JS документов в ней нет",
+        "  docs.json    — 2,9 МБ, при чтении обрезается; для одной статьи не нужен",
+        "  поиск в интернете — выдаёт форумы и соседние серверы, а не эту базу",
+    ])
+    return text + "\n"
+
+
 def build_text_index(docs):
     """Плоский текстовый индекс для моделей: id, раздел, название, размер."""
     lines = [
         "КОДЕКС MURRIETA — ИНДЕКС БАЗЫ",
         "Всего документов: %d." % len(docs),
         "",
+        "Карта адресов (2 КБ): docs/map.txt",
         "Статьи УАК по номеру: docs/uak/<номер>.html   (например docs/uak/12.8.html)",
         "Оглавление статей УАК: docs/uak/index.html",
         "Статьи других кодексов: docs/pk/<глава>.html, docs/konst/<номер>.html, docs/sud/<глава>.html, docs/trud/<номер>.html, docs/dor/<глава>.html",
@@ -836,6 +874,7 @@ def generate():
                 book_paths.append(path)
 
     out["docs/index.txt"] = build_text_index(docs_sorted)
+    out["docs/map.txt"] = build_map()
 
     out["sitemap.xml"] = build_sitemap(docs_sorted, today, book_paths)
     out["404.html"] = build_404()

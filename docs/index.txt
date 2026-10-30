@@ -1,6 +1,7 @@
 КОДЕКС MURRIETA — ИНДЕКС БАЗЫ
 Всего документов: 94.
 
+Карта адресов (2 КБ): docs/map.txt
 Статьи УАК по номеру: docs/uak/<номер>.html   (например docs/uak/12.8.html)
 Оглавление статей УАК: docs/uak/index.html
 Статьи других кодексов: docs/pk/<глава>.html, docs/konst/<номер>.html, docs/sud/<глава>.html, docs/trud/<номер>.html, docs/dor/<глава>.html
