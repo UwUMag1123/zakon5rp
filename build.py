@@ -43,6 +43,7 @@ SECTIONS = [
     ("law", "Законы"),
     ("precedent", "Судебные прецеденты и толкования"),
     ("appeal", "Решения Верховного суда по обращениям"),
+    ("method", "Методички по отдельным вопросам"),
     ("casebook", "Разбор кейсов и типовых ситуаций"),
     ("course", "Учебный курс (Академия прокуратуры)"),
 ]
@@ -54,7 +55,7 @@ CHUNKS = [
     ("codex.json", ("codex",)),
     ("law.json", ("law",)),
     ("appeal.json", ("appeal",)),
-    ("other.json", ("precedent", "casebook", "course")),
+    ("other.json", ("precedent", "method", "casebook", "course")),
 ]
 
 # Правила определения статуса документа по заголовку (те же, что в index.html).
