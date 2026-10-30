@@ -3,8 +3,9 @@
 
 Статьи УАК по номеру: docs/uak/<номер>.html   (например docs/uak/12.8.html)
 Оглавление статей УАК: docs/uak/index.html
-Статьи других кодексов: docs/pk/<глава>.html, docs/konst/<номер>.html, docs/sud/<глава>.html, docs/trud/<номер>.html
+Статьи других кодексов: docs/pk/<глава>.html, docs/konst/<номер>.html, docs/sud/<глава>.html, docs/trud/<номер>.html, docs/dor/<глава>.html
 Законы по главам: docs/law/<номер закона>/index.html   (например docs/law/20/index.html — закон о прокуратуре)
+Подборки прецедентов по частям: docs/prec/<id>/index.html   (например docs/prec/precedent-1/index.html)
 Решения и толкования по номерам: docs/appeal-nav.html
 Методички по темам: docs/method-nav.html
 Полный список документов: docs/index.html

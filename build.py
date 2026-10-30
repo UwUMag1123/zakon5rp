@@ -375,12 +375,13 @@ def build_404():
 
 # УАК нумерует статьи как 12.8 / 12.8.1, иногда с маркером юрисдикции впереди.
 RE_ARTICLE_DOTTED = re.compile(r"^(?:[\U0001F7E5\U0001F7E9\U0001F7E8]\s*)?(\d+\.\d+(?:\.\d+)*)\.?\s*\S")
-# остальные кодексы — «Статья 12. Текст».
-RE_ARTICLE_STAT = re.compile(r"^\s*Статья\s+(\d+(?:\.\d+)*)\.", re.M)
+# остальные кодексы — «Статья 12. Текст» (в Дорожном точка после номера ставится не всегда)
+RE_ARTICLE_STAT = re.compile(r"^\s*Статья\s+(\d+(?:\.\d+)*)\.?(?:\s+\S|\s*$)", re.M)
 RE_CHAPTER = re.compile(r"^\s*(?:Глава|Раздел)\s+([IVXLCDM]+|\d+(?:\.\d+)?)[\.\s]*(.*?)\s*$")
 RE_ART_IN_TEXT = re.compile(r"(?<![\d.])(\d+\.\d+(?:\.\d+)*)(?![\d.])")
 # «🟥12.8 [У]…» в начале статьи: номер уже стоит в заголовке страницы
 RE_LEAD_NUMBER = re.compile(r"^[\U0001F7E5\U0001F7E9\U0001F7E8]?\s*\d+\.\d+(?:\.\d+)*\.?\s*")
+RE_NUM = re.compile(r"№\s*(\d+)")
 
 # id кодекса -> (папка, короткое имя, режим разбивки)
 #   dotted  — статьи вида 12.8 (нумерация уникальна по всему кодексу)
@@ -392,7 +393,12 @@ CODEBOOKS = [
     ("codex-3", "pk", "ПК", "chapter"),
     ("codex-4", "sud", "СК", "chapter"),
     ("codex-5", "trud", "ТК", "article"),
+    ("codex-6", "dor", "ДК", "chapter"),
 ]
+
+# большие подборки прецедентов режем по размеру: структура внутри неоднородна
+COLLECTIONS = ["precedent-1", "precedent-2", "precedent-3"]
+CHUNK_LIMIT = 12000
 
 
 def parse_document(text, mode):
@@ -415,29 +421,37 @@ def parse_document(text, mode):
                 "text": body,
                 "articles": RE_ARTICLE_STAT.findall(body),
             })
-        return parts
+    else:
+        re_art = RE_ARTICLE_DOTTED if mode == "dotted" else RE_ARTICLE_STAT
+        chapter = ""
+        marks = []
+        for i, ln in enumerate(lines):
+            m_ch = RE_CHAPTER.match(ln)
+            if m_ch:
+                chapter = "Глава %s%s" % (m_ch.group(1), (". " + m_ch.group(2)) if m_ch.group(2) else "")
+                continue
+            m = re_art.match(ln)
+            if m:
+                marks.append((i, m.group(1), chapter))
 
-    re_art = RE_ARTICLE_DOTTED if mode == "dotted" else RE_ARTICLE_STAT
-    chapter = ""
-    marks = []
-    for i, ln in enumerate(lines):
-        m_ch = RE_CHAPTER.match(ln)
-        if m_ch:
-            chapter = "Глава %s%s" % (m_ch.group(1), (". " + m_ch.group(2)) if m_ch.group(2) else "")
-            continue
-        m = re_art.match(ln)
-        if m:
-            marks.append((i, m.group(1), chapter))
+        parts = []
+        for k, (start, num, chap) in enumerate(marks):
+            end = marks[k + 1][0] if k + 1 < len(marks) else len(lines)
+            parts.append({
+                "key": num,
+                "title": chap,
+                "text": "\n".join(lines[start:end]).strip(),
+                "articles": [num],
+            })
 
-    parts = []
-    for k, (start, num, chap) in enumerate(marks):
-        end = marks[k + 1][0] if k + 1 < len(marks) else len(lines)
-        parts.append({
-            "key": num,
-            "title": chap,
-            "text": "\n".join(lines[start:end]).strip(),
-            "articles": [num],
-        })
+    # вводная часть до первой главы или статьи не должна пропадать
+    if marks and marks[0][0] > 0:
+        head = "\n".join(lines[:marks[0][0]]).strip()
+        if len(head) > 40:
+            parts[0]["text"] = head + "\n\n" + parts[0]["text"]
+            if mode == "chapter":
+                parts[0]["articles"] = RE_ARTICLE_STAT.findall(parts[0]["text"])
+
     return parts
 
 
@@ -572,6 +586,105 @@ def build_code_pages(doc, folder, short, mode, docs):
     return out
 
 
+def split_chunks(text, limit=CHUNK_LIMIT):
+    """Режет длинный текст на части по границам строк."""
+    lines = text.split("\n")
+    chunks, cur, size = [], [], 0
+    for ln in lines:
+        if cur and size + len(ln) + 1 > limit:
+            chunks.append("\n".join(cur).strip())
+            cur, size = [], 0
+        cur.append(ln)
+        size += len(ln) + 1
+    if cur:
+        chunks.append("\n".join(cur).strip())
+    return [c for c in chunks if c]
+
+
+def chunk_numbers(chunk, limit=12):
+    nums = []
+    for n in RE_NUM.findall(chunk):
+        if n not in nums:
+            nums.append(n)
+        if len(nums) >= limit:
+            break
+    return nums
+
+
+def build_collection_pages(doc, folder):
+    """Подборки прецедентов: режем по размеру, потому что структура внутри неоднородна."""
+    chunks = split_chunks(doc["text"])
+    total = len(chunks)
+    up = "../" * (folder.count("/") + 1)
+    out = {}
+
+    for i, chunk in enumerate(chunks, 1):
+        nums = chunk_numbers(chunk)
+        extra = ""
+        if nums:
+            extra = '<p class="count">Номера в этой части: %s</p>\n' % esc(
+                ", ".join("№" + n for n in nums)
+            )
+        pager = ['<div class="pager">']
+        pager.append(
+            '<a href="%d.html"><span class="lbl">предыдущая</span>часть %d</a>' % (i - 1, i - 1)
+            if i > 1 else "<span></span>"
+        )
+        pager.append(
+            '<a href="%d.html" style="text-align:right"><span class="lbl">следующая</span>часть %d</a>'
+            % (i + 1, i + 1)
+            if i < total else "<span></span>"
+        )
+        pager.append("</div>")
+
+        body = (
+            '<nav class="nav"><a href="%s%s.html">&larr; %s</a>'
+            '<a href="index.html">Оглавление &rarr;</a></nav>\n'
+            '<div class="meta">%s · часть %d из %d</div>\n'
+            "<h1>%s — часть %d</h1>\n"
+            "%s"
+            '<div class="body">%s</div>\n'
+            "%s"
+            '<footer>Целиком — <a href="%s%s.html">docs/%s.html</a>. База «%s».</footer>'
+            % (
+                up, esc(doc["id"]), esc(SITE_NAME), esc(SECTION_LABEL[doc["section"]]), i, total,
+                esc(doc["title"]), i, extra, esc(chunk), "\n".join(pager),
+                up, esc(doc["id"]), esc(doc["id"]), esc(SITE_NAME),
+            )
+        )
+        out["docs/%s/%d.html" % (folder, i)] = page(
+            "%s — часть %d — %s" % (doc["title"], i, SITE_NAME),
+            "%s: часть %d из %d." % (doc["title"], i, total),
+            body,
+            canonical="%s/docs/%s/%d.html" % (SITE, folder, i),
+        )
+
+    items = []
+    for i, chunk in enumerate(chunks, 1):
+        nums = chunk_numbers(chunk, 6)
+        label = ", ".join("№" + n for n in nums) or "без номеров"
+        items.append(
+            '<li><a href="%d.html"><span class="n">%d</span>часть %d <span class="count">· %s</span></a></li>'
+            % (i, i, i, esc(label))
+        )
+    parts_html = [
+        '<nav class="nav"><a href="%s%s.html">&larr; %s</a>'
+        '<a href="%sindex.html">Все документы &rarr;</a></nav>'
+        % (up, esc(doc["id"]), esc(SITE_NAME), up),
+        "<h1>%s</h1>" % esc(doc["title"]),
+        '<p class="count">%d %s по ~%d КБ — документ большой и при чтении целиком обрезается.</p>'
+        % (total, plural_ru(total, "часть", "части", "частей"), CHUNK_LIMIT // 1000),
+        '<ul class="docs">' + "".join(items) + "</ul>",
+    ]
+    out["docs/%s/index.html" % folder] = page(
+        "%s — по частям — %s" % (doc["title"], SITE_NAME),
+        "%s: оглавление по частям." % doc["title"],
+        "\n".join(parts_html),
+        canonical="%s/docs/%s/index.html" % (SITE, folder),
+    )
+    return out
+
+
 def build_appeal_nav(docs):
     """Индекс решений и толкований по номерам: №541 -> документ."""
     rows = []
@@ -616,8 +729,9 @@ def build_text_index(docs):
         "",
         "Статьи УАК по номеру: docs/uak/<номер>.html   (например docs/uak/12.8.html)",
         "Оглавление статей УАК: docs/uak/index.html",
-        "Статьи других кодексов: docs/pk/<глава>.html, docs/konst/<номер>.html, docs/sud/<глава>.html, docs/trud/<номер>.html",
+        "Статьи других кодексов: docs/pk/<глава>.html, docs/konst/<номер>.html, docs/sud/<глава>.html, docs/trud/<номер>.html, docs/dor/<глава>.html",
         "Законы по главам: docs/law/<номер закона>/index.html   (например docs/law/20/index.html — закон о прокуратуре)",
+        "Подборки прецедентов по частям: docs/prec/<id>/index.html   (например docs/prec/precedent-1/index.html)",
         "Решения и толкования по номерам: docs/appeal-nav.html",
         "Методички по темам: docs/method-nav.html",
         "Полный список документов: docs/index.html",
@@ -677,6 +791,9 @@ def generate():
     plan = plan_books(docs_sorted)
     # относительные пути считаются от docs/, потому что страница документа лежит там
     book_index = {doc["id"]: "%s/index.html" % folder for doc, folder, _short, _mode in plan}
+    for d in docs_sorted:
+        if d["id"] in COLLECTIONS:
+            book_index[d["id"]] = "prec/%s/index.html" % d["id"]
 
     # чанки
     for fname, secs in CHUNKS:
@@ -707,6 +824,17 @@ def generate():
 
     out["docs/appeal-nav.html"] = build_appeal_nav(docs_sorted)
     book_paths.append("docs/appeal-nav.html")
+
+    # подборки прецедентов — по частям
+    for d in docs_sorted:
+        if d["id"] not in COLLECTIONS:
+            continue
+        folder = "prec/%s" % d["id"]
+        for path, content in build_collection_pages(d, folder).items():
+            out[path] = content
+            if path.endswith(".html"):
+                book_paths.append(path)
+
     out["docs/index.txt"] = build_text_index(docs_sorted)
 
     out["sitemap.xml"] = build_sitemap(docs_sorted, today, book_paths)

@@ -454,6 +454,20 @@
   <url><loc>https://zakon5rp.pages.dev/docs/trud/31.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
   <url><loc>https://zakon5rp.pages.dev/docs/trud/32.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
   <url><loc>https://zakon5rp.pages.dev/docs/trud/index.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/I.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/II.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/III.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/IV.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/V.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/VI.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/VII.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/VIII.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/IX.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/X.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/XI.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/XII.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/XIII.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/dor/index.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
   <url><loc>https://zakon5rp.pages.dev/docs/law/1/I.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
   <url><loc>https://zakon5rp.pages.dev/docs/law/1/II.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
   <url><loc>https://zakon5rp.pages.dev/docs/law/1/III.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
@@ -649,4 +663,45 @@
   <url><loc>https://zakon5rp.pages.dev/docs/law/24/IV.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
   <url><loc>https://zakon5rp.pages.dev/docs/law/24/index.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
   <url><loc>https://zakon5rp.pages.dev/docs/appeal-nav.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/1.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/2.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/3.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/4.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/5.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/6.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/7.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/8.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/9.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/10.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/11.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/12.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/13.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/14.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/15.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-1/index.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/1.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/2.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/3.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/4.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/5.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/6.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/7.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/8.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/9.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/10.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/11.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/12.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/13.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/14.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/15.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-2/index.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/1.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/2.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/3.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/4.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/5.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/6.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/7.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/8.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
+  <url><loc>https://zakon5rp.pages.dev/docs/prec/precedent-3/index.html</loc><lastmod>2026-10-30</lastmod><priority>0.6</priority></url>
 </urlset>
