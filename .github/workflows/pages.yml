@@ -1,0 +1,53 @@
+name: Pages (зеркало для России)
+
+# Основной сайт живёт на Cloudflare Pages, но домен *.pages.dev в России режется
+# провайдерами. Этот workflow публикует ту же статику на GitHub Pages —
+# uwumag1123.github.io/zakon5rp — который из России открывается.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Сгенерированное совпадает с docs.json
+        run: python build.py --check
+
+      - name: Собрать каталог для публикации
+        run: |
+          mkdir -p _site
+          rsync -a \
+            --exclude='.git' --exclude='.github' --exclude='tests' \
+            --exclude='build.py' --exclude='README.md' --exclude='_site' \
+            ./ _site/
+          echo "файлов к публикации: $(find _site -type f | wc -l)"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
