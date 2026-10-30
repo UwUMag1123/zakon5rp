@@ -131,6 +131,22 @@ a{color:var(--accent)}
   font-size:15.5px; line-height:1.75; min-width:0;
 }
 .doc-body mark{background:var(--mark); color:inherit; border-radius:2px}
+.doc-body mark.current-hit{
+  background:var(--accent); color:var(--accent-ink);
+  outline:2px solid var(--gold); outline-offset:1px;
+}
+.hit-nav{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  font-family:"PT Sans",sans-serif; font-size:12px; color:var(--ink-dim);
+}
+.hit-nav .hit-count{min-width:4.5em; text-align:center; font-variant-numeric:tabular-nums}
+.hit-nav button{
+  font-family:"PT Sans",sans-serif; font-size:12px; font-weight:700;
+  border:1px solid var(--rule); background:var(--paper); color:var(--ink);
+  border-radius:4px; padding:4px 10px; cursor:pointer; line-height:1.2;
+}
+.hit-nav button:hover{border-color:var(--gold); color:var(--gold)}
+.hit-nav button:disabled{opacity:.4; cursor:default}
 .empty{
   display:flex; flex-direction:column; align-items:flex-start; gap:10px;
   color:var(--ink-dim); font-family:"PT Sans",sans-serif; font-size:13.5px; padding-top:10px;
@@ -351,27 +367,67 @@ a{color:var(--accent)}
     });
   }
 
+  var hitIndex = -1;
+  var hitMarks = [];
+
+  function updateHitNav(){
+    var el = document.getElementById('hitNav');
+    if(!el) return;
+    var n = hitMarks.length;
+    if(n === 0){
+      el.innerHTML = '';
+      return;
+    }
+    var cur = hitIndex + 1;
+    el.innerHTML =
+      '<div class="hit-nav">'
+      + '<button type="button" id="hitPrev" title="Предыдущее (↑)">▲</button>'
+      + '<span class="hit-count">'+cur+' / '+n+'</span>'
+      + '<button type="button" id="hitNext" title="Следующее (↓)">▼</button>'
+      + '</div>';
+    document.getElementById('hitPrev').addEventListener('click', function(){ stepHit(-1); });
+    document.getElementById('hitNext').addEventListener('click', function(){ stepHit(1); });
+  }
+
+  function setCurrentHit(i){
+    if(!hitMarks.length) return;
+    hitMarks.forEach(function(m){ m.classList.remove('current-hit'); });
+    hitIndex = ((i % hitMarks.length) + hitMarks.length) % hitMarks.length;
+    var mark = hitMarks[hitIndex];
+    mark.classList.add('current-hit');
+    mark.scrollIntoView({behavior:'smooth', block:'center'});
+    updateHitNav();
+  }
+
+  function stepHit(delta){
+    if(!hitMarks.length) return;
+    setCurrentHit(hitIndex + delta);
+  }
+
   function renderDoc(d, q){
     current = d;
+    hitIndex = -1;
+    hitMarks = [];
     var body = q ? highlight(d.text, q) : escapeHtml(d.text);
+    var hitBar = q ? '<div id="hitNav" style="margin:0 0 12px"></div>' : '';
     sheet.innerHTML =
       '<div class="topline"><span>'+escapeHtml(SECTION_LABEL[d.section])+'</span>'
       + '<button class="copy-btn" id="copyDocBtn">Копировать текст</button></div>'
       + '<h1 class="doc-title">'+escapeHtml(d.title)+'</h1>'
+      + hitBar
       + '<div class="doc-body">'+body+'</div>';
     document.getElementById('copyDocBtn').addEventListener('click', function(){
-      copyText(d.title + '\n\n' + d.text, 'Текст документа скопирован');
+      copyText(d.title + '
+
+' + d.text, 'Текст документа скопирован');
     });
     if(q){
-      requestAnimationFrame(function(){
-        var mark = sheet.querySelector('mark');
-        if(mark){
-          mark.scrollIntoView({behavior:'smooth', block:'center'});
-          mark.style.outline = '2px solid var(--accent)';
-          mark.style.outlineOffset = '2px';
-          setTimeout(function(){ mark.style.outline = ''; mark.style.outlineOffset = ''; }, 2000);
-        }
-      });
+      hitMarks = Array.prototype.slice.call(sheet.querySelectorAll('.doc-body mark'));
+      if(hitMarks.length){
+        setCurrentHit(0);
+      } else {
+        updateHitNav();
+      }
     }
   }
 
@@ -402,6 +458,19 @@ a{color:var(--accent)}
     renderList();
     if(current){
       renderDoc(current, searchInput.value.trim());
+    }
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(!hitMarks.length) return;
+    var tag = (e.target && e.target.tagName) || '';
+    if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if(e.key === 'ArrowDown' || e.key === 'F3' && !e.shiftKey){
+      e.preventDefault();
+      stepHit(1);
+    } else if(e.key === 'ArrowUp' || (e.key === 'F3' && e.shiftKey)){
+      e.preventDefault();
+      stepHit(-1);
     }
   });
 
