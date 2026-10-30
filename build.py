@@ -322,10 +322,12 @@ def build_index_page(docs):
     )
 
 
-def build_sitemap(docs, today):
+def build_sitemap(docs, today, extra_paths=()):
     urls = [("%s/" % SITE, "1.0"), ("%s/docs/index.html" % SITE, "0.8")]
     for d in docs:
         urls.append(("%s/docs/%s.html" % (SITE, d["id"]), "0.7"))
+    for path in extra_paths:
+        urls.append(("%s/%s" % (SITE, path), "0.6"))
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -348,6 +350,143 @@ def build_404():
         % esc(SITE_NAME)
     )
     return page("Страница не найдена — %s" % SITE_NAME, "Страница не найдена.", body)
+
+
+# ----------------------------------------------------------------------------- статьи кодексов
+
+# Статьи УАК в тексте начинаются с номера, иногда после маркера юрисдикции.
+RE_ARTICLE = re.compile(r"^(?:[\U0001F7E5\U0001F7E9\U0001F7E8]\s*)?(\d+\.\d+(?:\.\d+)*)\.?\s*\S")
+RE_CHAPTER = re.compile(r"^Глава\s+(\d+(?:\.\d+)?)\.\s*(.+?)\s*$")
+RE_ART_IN_TEXT = re.compile(r"(?<![\d.])(\d+\.\d+(?:\.\d+)*)(?![\d.])")
+
+# id кодекса -> папка со страницами статей и подпись
+CODEBOOKS = {
+    "codex-2": ("uak", "Уголовно-административный кодекс"),
+}
+
+
+def parse_articles(text):
+    """Режет кодекс на статьи: номер, глава, текст."""
+    lines = text.split("\n")
+    chapter = ""
+    found = []  # (line_index, num, chapter_at_that_point)
+    for i, ln in enumerate(lines):
+        m_ch = RE_CHAPTER.match(ln)
+        if m_ch:
+            chapter = "Глава %s. %s" % (m_ch.group(1), m_ch.group(2))
+            continue
+        m = RE_ARTICLE.match(ln)
+        if m:
+            found.append((i, m.group(1), chapter))
+    articles = []
+    for k, (start, num, chap) in enumerate(found):
+        end = found[k + 1][0] if k + 1 < len(found) else len(lines)
+        body = "\n".join(lines[start:end]).strip()
+        articles.append({"num": num, "chapter": chap, "text": body})
+    return articles
+
+
+def article_refs(articles, docs):
+    """Для каждой статьи — документы базы, где она упоминается."""
+    # один проход по всем документам: собираем, где какие номера встречаются
+    where = {}
+    for d in docs:
+        if d["id"].startswith("codex-"):
+            continue
+        for num in set(RE_ART_IN_TEXT.findall(d["text"])):
+            where.setdefault(num, []).append(d)
+    refs = {}
+    for a in articles:
+        items = where.get(a["num"], [])
+        # сначала толкования и прецеденты, потом методички
+        weight = {"appeal": 0, "precedent": 1, "method": 2, "casebook": 3, "course": 4}
+        items = sorted(items, key=lambda d: weight.get(d["section"], 9))
+        refs[a["num"]] = items[:6]
+    return refs
+
+
+def article_title(a):
+    """Первая содержательная строка статьи — для заголовка страницы."""
+    line = a["text"].split("\n")[0]
+    line = RE_ARTICLE.sub(lambda m: "", line, count=1).strip()
+    line = line.lstrip("*").strip()
+    return line[:140]
+
+
+def build_article_pages(doc, folder, label, articles, refs):
+    out = {}
+    for a in articles:
+        title_line = article_title(a)
+        meta = [esc(label), esc(a["chapter"])] if a["chapter"] else [esc(label)]
+        related = ""
+        items = refs.get(a["num"]) or []
+        if items:
+            links = "".join(
+                '<li><a href="../%s.html">%s</a></li>' % (esc(d["id"]), esc(d["title"])) for d in items
+            )
+            related = (
+                "<h2>Где эта статья упоминается</h2>\n<ul class=\"docs\">" + links + "</ul>\n"
+            )
+        body = (
+            '<nav class="nav"><a href="../%s.html">&larr; %s</a>'
+            '<a href="index.html">Все статьи &rarr;</a></nav>\n'
+            '<div class="meta">%s</div>\n'
+            "<h1>Ст. %s УАК</h1>\n"
+            '<div class="body">%s</div>\n'
+            "%s"
+            '<footer>Полный кодекс — <a href="../%s.html">docs/%s.html</a>. '
+            "База «%s».</footer>"
+            % (
+                esc(doc["id"]),
+                esc(doc["title"]),
+                " · ".join(meta),
+                esc(a["num"]),
+                esc(a["text"]),
+                related,
+                esc(doc["id"]),
+                esc(doc["id"]),
+                esc(SITE_NAME),
+            )
+        )
+        out["docs/%s/%s.html" % (folder, a["num"])] = page(
+            "Ст. %s УАК — %s" % (a["num"], SITE_NAME),
+            "%s. Статья %s Уголовно-административного кодекса Murrieta: полный текст."
+            % (title_line[:120], a["num"]),
+            body,
+            canonical="%s/docs/%s/%s.html" % (SITE, folder, a["num"]),
+        )
+
+    # оглавление по главам
+    chapters, order = {}, []
+    for a in articles:
+        ch = a["chapter"] or "Без главы"
+        if ch not in chapters:
+            chapters[ch] = []
+            order.append(ch)
+        chapters[ch].append(a)
+    parts = [
+        '<nav class="nav"><a href="../%s.html">&larr; %s</a>'
+        '<a href="../index.html">Все документы &rarr;</a></nav>' % (esc(doc["id"]), esc(SITE_NAME)),
+        "<h1>Все статьи УАК</h1>",
+        '<p class="count">%d статей. Каждая — отдельной страницей: '
+        "docs/%s/&lt;номер&gt;.html</p>" % (len(articles), folder),
+    ]
+    for ch in order:
+        parts.append("<h2>%s</h2>" % esc(ch))
+        parts.append('<ul class="docs">')
+        for a in chapters[ch]:
+            parts.append(
+                '<li><a href="%s.html"><span class="n">%s</span>%s</a></li>'
+                % (esc(a["num"]), esc(a["num"]), esc(article_title(a)[:110]))
+            )
+        parts.append("</ul>")
+    out["docs/%s/index.html" % folder] = page(
+        "Все статьи УАК — %s" % SITE_NAME,
+        "Оглавление статей Уголовно-административного кодекса Murrieta: %d статей по главам." % len(articles),
+        "\n".join(parts),
+        canonical="%s/docs/%s/index.html" % (SITE, folder),
+    )
+    return out
 
 
 # ----------------------------------------------------------------------------- сборка
@@ -375,7 +514,20 @@ def generate():
             out["docs/%s.html" % d["id"]] = build_doc_page(d, prev_doc, next_doc)
 
     out["docs/index.html"] = build_index_page(docs_sorted)
-    out["sitemap.xml"] = build_sitemap(docs_sorted, today)
+
+    # страницы отдельных статей кодексов
+    book_paths = []
+    for codex_id, (folder, label) in CODEBOOKS.items():
+        src = next((d for d in docs_sorted if d["id"] == codex_id), None)
+        if not src:
+            continue
+        articles = parse_articles(src["text"])
+        refs = article_refs(articles, docs_sorted)
+        for path, content in build_article_pages(src, folder, label, articles, refs).items():
+            out[path] = content
+            book_paths.append(path)
+
+    out["sitemap.xml"] = build_sitemap(docs_sorted, today, book_paths)
     out["404.html"] = build_404()
     out["robots.txt"] = "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % SITE
     return out

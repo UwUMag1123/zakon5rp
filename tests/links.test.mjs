@@ -57,8 +57,14 @@ checkFile('index.html');
 checkFile('docs/index.html');
 checkFile('404.html');
 
-for (const f of readdirSync(join(root, 'docs'))) {
-  if (f.endsWith('.html') && f !== 'index.html') checkFile(join('docs', f));
+for (const f of readdirSync(join(root, 'docs'), { withFileTypes: true })) {
+  if (f.isDirectory()) {
+    for (const g of readdirSync(join(root, 'docs', f.name))) {
+      if (g.endsWith('.html')) checkFile(join('docs', f.name, g));
+    }
+  } else if (f.name.endsWith('.html') && f.name !== 'index.html') {
+    checkFile(join('docs', f.name));
+  }
 }
 
 // каждая запись docs.json обязана иметь свою страницу
