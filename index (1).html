@@ -1,0 +1,522 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Кодекс Murrieta</title>
+<style>
+/* Layout concept: fixed left register (section rail + doc list) beside a
+   reading column that behaves like a printed statute page; an AI-prompt
+   drawer docks at the bottom of the rail. */
+:root{
+  --bg:#f3efe6; --paper:#fffdf8; --ink:#201c14; --ink-dim:#6b6456;
+  --rule:#d8d0bd; --accent:#8a1f1f; --accent-ink:#fff8f0; --gold:#9c7a2e;
+  --mark:#f3dca0; --mono-bg:#eae4d4;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15130f; --paper:#1c1a14; --ink:#ece6d6; --ink-dim:#a39a84;
+    --rule:#3a3528; --accent:#d08a5c; --accent-ink:#1c1a14; --gold:#c9a24b;
+    --mark:#4a3c1e; --mono-bg:#24211a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15130f; --paper:#1c1a14; --ink:#ece6d6; --ink-dim:#a39a84;
+  --rule:#3a3528; --accent:#d08a5c; --accent-ink:#1c1a14; --gold:#c9a24b;
+  --mark:#4a3c1e; --mono-bg:#24211a;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"PT Serif", Georgia, "Times New Roman", serif;
+  padding-left:max(0px, env(safe-area-inset-left,0px));
+  padding-right:max(0px, env(safe-area-inset-right,0px));
+}
+::selection{background:var(--mark)}
+a{color:var(--accent)}
+.app{display:flex; min-height:100%; width:100%}
+
+/* ---- rail ---- */
+.rail{
+  width:340px; min-width:260px; max-width:38vw; flex:0 0 auto;
+  display:flex; flex-direction:column;
+  border-right:1px solid var(--rule); background:var(--paper);
+  height:100vh; position:sticky; top:0;
+}
+.rail-head{
+  padding:18px 16px 14px; border-bottom:1px solid var(--rule);
+}
+.brand{display:flex; align-items:baseline; gap:8px; margin:0 0 2px}
+.brand .mark{
+  font-family:"PT Sans", Arial, sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.14em; color:var(--gold); border:1px solid var(--gold);
+  padding:2px 6px; border-radius:2px;
+}
+.brand h1{font-size:19px; margin:0; font-weight:700; letter-spacing:.01em}
+.brand-sub{font-family:"PT Sans",sans-serif; font-size:11.5px; color:var(--ink-dim); margin:4px 0 12px}
+.search{
+  display:flex; align-items:center; gap:6px; background:var(--mono-bg);
+  border:1px solid var(--rule); border-radius:5px; padding:7px 10px;
+}
+.search svg{flex:0 0 auto; opacity:.6}
+.search input{
+  border:0; background:transparent; outline:0; width:100%; color:var(--ink);
+  font-family:"PT Sans",sans-serif; font-size:13px;
+}
+.search input::placeholder{color:var(--ink-dim)}
+.hitcount{font-family:"PT Sans",sans-serif; font-size:10.5px; color:var(--ink-dim); margin-top:6px; min-height:14px}
+
+.rail-list{flex:1 1 auto; overflow-y:auto; padding:6px 0 10px}
+.section-label{
+  font-family:"PT Sans",sans-serif; font-size:10.5px; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--gold);
+  padding:14px 16px 6px;
+}
+.doclink{
+  display:block; width:100%; text-align:left; background:transparent; border:0;
+  padding:7px 16px 7px 18px; color:var(--ink); font-family:"PT Serif",serif;
+  font-size:13.5px; line-height:1.3; cursor:pointer; border-left:2px solid transparent;
+}
+.doclink:hover{background:var(--mono-bg)}
+.doclink.active{
+  background:var(--mono-bg); border-left-color:var(--accent); font-weight:700;
+}
+.doclink mark{background:var(--mark); color:inherit; padding:0 1px; border-radius:2px}
+.doclink .snippet{display:block; font-family:"PT Sans",sans-serif; font-size:11px; color:var(--ink-dim); margin-top:2px; font-weight:400}
+
+.rail-foot{border-top:1px solid var(--rule); padding:10px 14px; font-family:"PT Sans",sans-serif}
+.ai-toggle{
+  width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  background:var(--accent); color:var(--accent-ink); border:0; border-radius:5px;
+  padding:9px 12px; font-size:12.5px; font-weight:700; cursor:pointer;
+  font-family:"PT Sans",sans-serif; letter-spacing:.01em;
+}
+.theme-row{display:flex; gap:6px; margin-top:8px}
+.theme-btn{
+  flex:1; font-family:"PT Sans",sans-serif; font-size:10.5px; padding:5px 0;
+  border:1px solid var(--rule); background:transparent; color:var(--ink-dim);
+  border-radius:4px; cursor:pointer;
+}
+.theme-btn.active{border-color:var(--gold); color:var(--gold); font-weight:700}
+
+/* ---- reading column ---- */
+.main{flex:1 1 auto; min-width:0; display:flex; justify-content:center}
+.sheet{
+  width:100%; max-width:760px; padding:40px 28px 90px;
+  min-width:0;
+}
+.topline{
+  display:flex; justify-content:space-between; align-items:center; gap:10px;
+  font-family:"PT Sans",sans-serif; font-size:11px; color:var(--ink-dim);
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px;
+}
+.copy-btn{
+  font-family:"PT Sans",sans-serif; font-size:11px; border:1px solid var(--rule);
+  background:var(--paper); color:var(--ink-dim); border-radius:4px; padding:5px 10px;
+  cursor:pointer;
+}
+.copy-btn:hover{border-color:var(--gold); color:var(--gold)}
+.doc-title{font-size:clamp(22px,3vw,30px); line-height:1.25; margin:0 0 20px; text-wrap:balance; font-weight:700}
+.doc-body{
+  background:var(--paper); border:1px solid var(--rule); border-radius:3px;
+  padding:clamp(18px,4vw,40px); white-space:pre-wrap; word-wrap:break-word;
+  font-size:15.5px; line-height:1.75; min-width:0;
+}
+.doc-body mark{background:var(--mark); color:inherit; border-radius:2px}
+.empty{
+  display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+  color:var(--ink-dim); font-family:"PT Sans",sans-serif; font-size:13.5px; padding-top:10px;
+}
+.empty b{color:var(--ink); font-family:"PT Serif",serif; font-size:17px}
+
+/* ---- AI drawer ---- */
+.drawer-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:40; display:none;
+}
+.drawer-backdrop.open{display:block}
+.drawer{
+  position:fixed; right:0; top:0; bottom:0; width:min(480px,92vw); z-index:41;
+  background:var(--paper); border-left:1px solid var(--rule);
+  transform:translateX(100%); transition:transform .22s ease;
+  display:flex; flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px); padding-right:env(safe-area-inset-right,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.drawer.open{transform:translateX(0)}
+.drawer-head{
+  padding:16px 18px 12px; border-bottom:1px solid var(--rule);
+  display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+}
+.drawer-head h2{margin:0 0 4px; font-size:17px}
+.drawer-head p{margin:0; font-family:"PT Sans",sans-serif; font-size:12px; color:var(--ink-dim); line-height:1.5}
+.drawer-close{background:transparent; border:0; color:var(--ink-dim); font-size:20px; cursor:pointer; line-height:1}
+.drawer-body{flex:1 1 auto; overflow-y:auto; padding:14px 18px; font-family:"PT Sans",sans-serif}
+.drawer-body label{display:block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); margin:14px 0 6px}
+.drawer-body label:first-child{margin-top:0}
+#promptBox{
+  width:100%; min-height:300px; resize:vertical; border:1px solid var(--rule);
+  border-radius:5px; background:var(--mono-bg); color:var(--ink); padding:12px;
+  font-family:"JetBrains Mono","SF Mono",Consolas,monospace; font-size:12px; line-height:1.55;
+}
+.urlbox{
+  display:flex; gap:6px; align-items:center; background:var(--mono-bg);
+  border:1px solid var(--rule); border-radius:5px; padding:8px 10px;
+  font-family:"JetBrains Mono",monospace; font-size:11.5px; word-break:break-all;
+}
+.row-btns{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+.btn{
+  font-family:"PT Sans",sans-serif; font-size:12px; font-weight:700; cursor:pointer;
+  border-radius:5px; padding:8px 13px; border:1px solid var(--rule); background:var(--paper); color:var(--ink);
+}
+.btn.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.note{font-size:11.5px; color:var(--ink-dim); line-height:1.6; margin-top:10px}
+.note code{background:var(--mono-bg); padding:1px 4px; border-radius:3px; font-family:"JetBrains Mono",monospace}
+.toast{
+  position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(10px);
+  background:var(--ink); color:var(--bg); font-family:"PT Sans",sans-serif; font-size:12.5px;
+  padding:9px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .18s, transform .18s;
+  z-index:60;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+@media (max-width:780px){
+  .app{flex-direction:column}
+  .rail{
+    position:static; width:100%; max-width:none; height:auto;
+    border-right:0; border-bottom:1px solid var(--rule);
+  }
+  .rail-list{max-height:40vh}
+  .sheet{padding:24px 16px 70px}
+}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=PT+Sans:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<div class="app">
+  <nav class="rail">
+    <div class="rail-head">
+      <div class="brand">
+        <span class="mark">SA</span>
+        <h1>Кодекс Murrieta</h1>
+      </div>
+      <p class="brand-sub">Законодательная база сервера Murrieta · полные тексты</p>
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Поиск по статьям и документам…" autocomplete="off">
+      </div>
+      <div class="hitcount" id="hitcount"></div>
+    </div>
+    <div class="rail-list" id="railList"></div>
+    <div class="rail-foot">
+      <button class="ai-toggle" id="aiToggle">
+        <span>⚖ Промпт для ИИ‑прокурора</span><span>›</span>
+      </button>
+      <div class="theme-row">
+        <button class="theme-btn" data-theme-choice="light">Светлая</button>
+        <button class="theme-btn" data-theme-choice="dark">Тёмная</button>
+        <button class="theme-btn active" data-theme-choice="system">Система</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="sheet" id="sheet">
+      <!-- filled by JS -->
+    </div>
+  </main>
+</div>
+
+<div class="drawer-backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <h2>Промпт для ИИ</h2>
+      <p>Скопируйте в системный промпт любой нейросети — она получит полный контекст законодательства Murrieta и инструкцию, как им пользоваться.</p>
+    </div>
+    <button class="drawer-close" id="drawerClose" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="drawer-body">
+    <label for="promptBox">Системный промпт (редактируемый)</label>
+    <textarea id="promptBox" spellcheck="false"></textarea>
+    <div class="row-btns">
+      <button class="btn primary" id="copyPrompt">Скопировать промпт</button>
+      <button class="btn ghost" id="resetPrompt">Сбросить к исходному</button>
+    </div>
+
+    <label for="urlOut">Ссылка на эту базу</label>
+    <div class="urlbox"><span id="urlOut">—</span></div>
+    <div class="row-btns">
+      <button class="btn" id="copyUrl">Скопировать ссылку</button>
+      <button class="btn" id="copyAll">Скопировать весь свод текстом</button>
+    </div>
+    <p class="note">
+      Для ИИ‑агентов: документ открывается напрямую по адресу вида <code>#codex-1</code> (раздел‑номер — см. список слева).
+      Полные данные доступны программно по относительному пути <code>docs.json</code> (JSON‑массив объектов
+      <code>{id, section, sectionName, title, text}</code>) — модель с доступом к открытой странице может получить его через <code>fetch</code>.
+      Если инструмент модели читает веб‑страницы постранично и обрезает большой <code>docs.json</code> (2+ МБ), используйте лёгкие
+      статичные страницы: список всех документов — <code>docs/index.html</code>, конкретный документ — <code>docs/&lt;id&gt;.html</code>
+      (например <code>docs/codex-2.html</code>) с полным текстом без сокращений на одной странице.
+    </p>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SECTION_ORDER = ["codex","law","precedent","appeal"];
+  var SECTION_LABEL = {
+    codex:"Кодексы", law:"Законы", precedent:"Судебные прецеденты и толкования",
+    appeal:"Решения Верховного суда по обращениям"
+  };
+
+  var DOCS = [];
+  var byId = {};
+  var current = null;
+
+  var railList = document.getElementById('railList');
+  var sheet = document.getElementById('sheet');
+  var searchInput = document.getElementById('searchInput');
+  var hitcount = document.getElementById('hitcount');
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+  function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+  function highlight(text, q){
+    if(!q) return escapeHtml(text);
+    var re = new RegExp('(' + escapeRe(q) + ')', 'ig');
+    var parts = text.split(re);
+    var out = '';
+    for(var i=0;i<parts.length;i++){
+      out += (i % 2 === 1) ? '<mark>'+escapeHtml(parts[i])+'</mark>' : escapeHtml(parts[i]);
+    }
+    return out;
+  }
+
+  function snippetAround(text, q){
+    var idx = text.toLowerCase().indexOf(q.toLowerCase());
+    if(idx < 0) return '';
+    var start = Math.max(0, idx - 40);
+    var end = Math.min(text.length, idx + q.length + 60);
+    var s = (start>0?'…':'') + text.slice(start,end).replace(/\s+/g,' ').trim() + (end<text.length?'…':'');
+    return s;
+  }
+
+  function renderList(){
+    var q = searchInput.value.trim();
+    var ql = q.toLowerCase();
+    var html = '';
+    var total = 0;
+    SECTION_ORDER.forEach(function(sec){
+      var items = DOCS.filter(function(d){ return d.section === sec; });
+      var filtered = items.filter(function(d){
+        if(!ql) return true;
+        return d.title.toLowerCase().indexOf(ql) >= 0 || d.text.toLowerCase().indexOf(ql) >= 0;
+      });
+      if(!filtered.length) return;
+      html += '<div class="section-label">'+escapeHtml(SECTION_LABEL[sec])+'</div>';
+      filtered.forEach(function(d){
+        total++;
+        var active = current && current.id === d.id ? ' active' : '';
+        var snip = ql ? snippetAround(d.text, q) : '';
+        html += '<button class="doclink'+active+'" data-id="'+d.id+'">'
+              + highlight(d.title, ql ? q : '')
+              + (snip ? '<span class="snippet">'+highlight(snip, q)+'</span>' : '')
+              + '</button>';
+      });
+    });
+    railList.innerHTML = html || '<div class="section-label">Ничего не найдено</div>';
+    hitcount.textContent = ql ? (total + (total===1?' документ':' документ(ов)') + ' найдено') : (DOCS.length + ' документов в базе');
+    Array.prototype.forEach.call(railList.querySelectorAll('.doclink'), function(btn){
+      btn.addEventListener('click', function(){
+        location.hash = btn.getAttribute('data-id');
+      });
+    });
+  }
+
+  function renderDoc(d, q){
+    current = d;
+    var body = q ? highlight(d.text, q) : escapeHtml(d.text);
+    sheet.innerHTML =
+      '<div class="topline"><span>'+escapeHtml(SECTION_LABEL[d.section])+'</span>'
+      + '<button class="copy-btn" id="copyDocBtn">Копировать текст</button></div>'
+      + '<h1 class="doc-title">'+escapeHtml(d.title)+'</h1>'
+      + '<div class="doc-body">'+body+'</div>';
+    document.getElementById('copyDocBtn').addEventListener('click', function(){
+      copyText(d.title + '\n\n' + d.text, 'Текст документа скопирован');
+    });
+  }
+
+  function renderEmpty(){
+    current = null;
+    sheet.innerHTML =
+      '<div class="empty">'
+      + '<b>Выберите документ слева</b>'
+      + '<span>Полная законодательная база сервера Murrieta: кодексы, законы, судебные прецеденты и решения Верховного суда по обращениям — без сокращений, в одном месте.</span>'
+      + '<span>Нажмите «⚖ Промпт для ИИ‑прокурора», чтобы получить готовый системный промпт для работы с этой базой в любой нейросети.</span>'
+      + '</div>';
+  }
+
+  function applyHash(){
+    var id = location.hash.replace('#','');
+    var q = searchInput.value.trim();
+    if(id && byId[id]){
+      renderDoc(byId[id], q);
+    } else {
+      renderEmpty();
+    }
+    renderList();
+    window.scrollTo(0,0);
+  }
+
+  searchInput.addEventListener('input', function(){
+    renderList();
+    if(current){
+      renderDoc(current, searchInput.value.trim());
+    }
+  });
+
+  window.addEventListener('hashchange', applyHash);
+
+  // ---- toast ----
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 1800);
+  }
+  function copyText(text, okMsg){
+    function fallback(){
+      try{
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        toast(okMsg || 'Скопировано');
+      }catch(e){ toast('Не удалось скопировать'); }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast(okMsg || 'Скопировано'); }, fallback);
+    } else { fallback(); }
+  }
+
+  // ---- AI drawer ----
+  var drawer = document.getElementById('drawer');
+  var backdrop = document.getElementById('backdrop');
+  document.getElementById('aiToggle').addEventListener('click', function(){
+    drawer.classList.add('open'); backdrop.classList.add('open');
+  });
+  document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  function closeDrawer(){ drawer.classList.remove('open'); backdrop.classList.remove('open'); }
+
+  var DEFAULT_PROMPT =
+"Ты — ИИ-прокурор сервера Murrieta (GTA 5 RP, gta5rp.com). Работаешь строго по законодательной базе, " +
+"опубликованной на сайте «Кодекс Murrieta» по ссылке: " + location.href.replace(/#.*$/, '') + "\n\n" +
+
+"ИСТОЧНИК ПРАВА — ОБЯЗАТЕЛЬНОЕ ДЕЙСТВИЕ ПЕРЕД КАЖДЫМ ОТВЕТОМ:\n" +
+"Перед тем как ответить на ЛЮБОЙ вопрос по существу, ты обязан открыть указанную ссылку и прочитать " +
+"актуальный текст нужного кодекса/закона/прецедента/решения Верховного суда. Делай это каждый раз заново, даже " +
+"если уже отвечал на похожий вопрос раньше: база могла обновиться, и память/кэш не являются источником права. " +
+"Отвечать по памяти, не сверившись с сайтом в рамках текущего сообщения, запрещено.\n" +
+"Если можешь выполнять код/fetch — забери относительный файл docs.json (JSON-массив объектов " +
+"{id, section, sectionName, title, text} со всеми документами целиком). " +
+"Если твой инструмент читает страницы постранично и обрезает большой docs.json — вместо него открой лёгкую " +
+"статичную страницу конкретного документа по адресу docs/<id>.html (список всех id и ссылок — на странице " +
+"docs/index.html), там полный текст документа на одной странице без обрезаний. Если нужной статьи не нашёл ни " +
+"в docs.json, ни на статичной странице документа — так и скажи, не придумывай текст статьи.\n\n" +
+
+"ПРИНЦИПЫ РАБОТЫ:\n" +
+"1. Используешь только нормы, фактически найденные в базе Murrieta. Никакого реального права РФ/США, никаких " +
+"общих представлений о юриспруденции \"по аналогии\" — только то, что прямо написано в кодексах, законах, " +
+"прецедентах и решениях Верховного суда на сайте.\n" +
+"2. Запрещено додумывать, домысливать и достраивать фактические обстоятельства дела. Если пользователь не " +
+"сообщил деталь, важную для квалификации (время, статус лица, наличие умысла, последствия и т.п.) — не " +
+"предполагай её сам, а прямо запроси. Не выдумывай статьи, номера, даты, прецеденты или формулировки, " +
+"которых нет в базе.\n" +
+"3. Ноль воды. Никаких вступлений, извинений, общих рассуждений о праве, повторения вопроса, оговорок " +
+"\"я всего лишь ИИ\". Только по делу.\n" +
+"4. Для каждой правовой позиции — точная ссылка: документ + номер статьи (дословная цитата или близкий к " +
+"тексту пересказ). Если позицию уточняет или меняет толкование/прецедент/решение Верховного суда — указываешь " +
+"это отдельно и явно, с номером обращения.\n" +
+"5. Если нормы по вопросу в базе нет, она противоречива или неполна — прямо и коротко говоришь об этом, " +
+"не закрываешь пробел собственной фантазией.\n\n" +
+
+"СТРУКТУРА ОТВЕТА (строго, без лишних заголовков и воды):\n" +
+"Квалификация: что это за деяние/вопрос и по какой статье (документ, статья).\n" +
+"Состав: ключевые признаки состава из текста статьи, применённые к фактам, которые сообщил пользователь " +
+"(без домысливания недостающих).\n" +
+"Практика: применимые прецеденты/толкования/решения Верховного суда, если найдены — с номерами; если не найдены " +
+"— прямо пишешь \"практики по данному вопросу в базе не найдено\".\n" +
+"Позиция прокурора: обвинение/мера/процессуальное действие, которое следует из норм — без эмоций, по фактам.\n" +
+"Чего не хватает: если для точного вывода не хватает фактов — список недостающих вопросов пользователю.\n\n" +
+
+"Ты прокурор, а не адвокат и не судья: не ищешь оправданий стороне защиты сверх того, что прямо следует из " +
+"буквы закона, но и не завышаешь квалификацию. Строгое, точное, проверяемое по источнику применение закона.";
+
+  var promptBox = document.getElementById('promptBox');
+  var STORE_KEY = 'murrieta_codex_prompt_v1';
+  function loadPrompt(){
+    try{
+      var saved = localStorage.getItem(STORE_KEY);
+      promptBox.value = saved !== null ? saved : DEFAULT_PROMPT;
+    }catch(e){ promptBox.value = DEFAULT_PROMPT; }
+  }
+  promptBox.addEventListener('input', function(){
+    try{ localStorage.setItem(STORE_KEY, promptBox.value); }catch(e){}
+  });
+  document.getElementById('resetPrompt').addEventListener('click', function(){
+    promptBox.value = DEFAULT_PROMPT;
+    try{ localStorage.setItem(STORE_KEY, DEFAULT_PROMPT); }catch(e){}
+    toast('Промпт сброшен');
+  });
+  document.getElementById('copyPrompt').addEventListener('click', function(){
+    copyText(promptBox.value, 'Промпт скопирован');
+  });
+  document.getElementById('copyUrl').addEventListener('click', function(){
+    copyText(location.href, 'Ссылка скопирована');
+  });
+  document.getElementById('copyAll').addEventListener('click', function(){
+    var all = DOCS.map(function(d){
+      return '### ['+SECTION_LABEL[d.section]+'] '+d.title+'\n\n'+d.text;
+    }).join('\n\n----------------------------------------\n\n');
+    copyText(all, 'Весь свод скопирован ('+DOCS.length+' документов)');
+  });
+  document.getElementById('urlOut').textContent = location.href.replace(/#.*$/, '');
+
+  // ---- theme ----
+  var themeBtns = document.querySelectorAll('.theme-btn');
+  function setTheme(choice){
+    if(choice === 'system'){ document.documentElement.removeAttribute('data-theme'); }
+    else { document.documentElement.setAttribute('data-theme', choice); }
+    themeBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-theme-choice')===choice); });
+    try{ localStorage.setItem('murrieta_codex_theme', choice); }catch(e){}
+  }
+  themeBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setTheme(b.getAttribute('data-theme-choice')); });
+  });
+  try{
+    var savedTheme = localStorage.getItem('murrieta_codex_theme');
+    if(savedTheme) setTheme(savedTheme);
+  }catch(e){}
+
+  // ---- boot ----
+  renderEmpty();
+  loadPrompt();
+  fetch('docs.json').then(function(r){ return r.json(); }).then(function(data){
+    DOCS = data;
+    DOCS.forEach(function(d){ byId[d.id] = d; });
+    applyHash();
+  }).catch(function(){
+    railList.innerHTML = '<div class="section-label">Не удалось загрузить базу (docs.json)</div>';
+  });
+})();
+</script>
