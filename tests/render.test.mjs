@@ -139,12 +139,20 @@ const promptBox = document.getElementById('promptBox');
 check('список документов отрисован', (railList.innerHTML.match(/class="doclink/g) || []).length === docs.length,
   (railList.innerHTML.match(/class="doclink/g) || []).length + ' из ' + docs.length);
 check('счётчик показал базу', /в базе/.test(hitcount.innerHTML), hitcount.innerHTML);
-check('документ открылся по умолчанию', sheet.innerHTML.includes('doc-title') && sheet.innerHTML.includes('Конституция'));
-check('появилась постоянная ссылка', sheet.innerHTML.includes('docs/codex-1.html'));
+check('на главной — обложка со статистикой', sheet.innerHTML.includes('class="hero"') && sheet.innerHTML.includes('class="stats"'));
+check('обложка показывает число документов', /\d+ (документ|документа|документов)/.test(sheet.innerHTML));
 check('промпт заполнен', promptBox.value.length > 2000, 'длина ' + promptBox.value.length);
 check('в промпте есть база', promptBox.value.includes('zakon5rp.pages.dev'));
-check('подсветки нет без запроса', !sheet.innerHTML.includes('<mark>'));
 check('статус «утратил силу» в списке', railList.innerHTML.includes('утратил силу'));
+
+console.log('— открытие документа —');
+location.hash = '#codex-1';
+window._l.hashchange();
+await sleep(60);
+check('документ открылся по ссылке', sheet.innerHTML.includes('doc-title') && sheet.innerHTML.includes('Конституция'));
+check('есть постоянная ссылка', sheet.innerHTML.includes('docs/codex-1.html'));
+check('есть порядковый номер', /doc-index/.test(sheet.innerHTML));
+check('подсветки нет без запроса', !sheet.innerHTML.includes('<mark>'));
 
 console.log('— поиск —');
 searchInput.value = 'статья';
