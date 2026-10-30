@@ -3,8 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Полная законодательная база сервера Murrieta (GTA 5 RP, gta5rp.com): кодексы, законы, судебные прецеденты и решения Верховного суда — без сокращений, с поиском и готовым промптом для ИИ.">
+<meta name="theme-color" content="#f3efe6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15130f" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://zakon5rp.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Кодекс Murrieta">
+<meta property="og:title" content="Кодекс Murrieta — законодательство сервера Murrieta">
+<meta property="og:description" content="Кодексы, законы, прецеденты и решения Верховного суда сервера Murrieta — полные тексты, поиск, промпт для ИИ.">
+<meta property="og:url" content="https://zakon5rp.pages.dev/">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <title>Кодекс Murrieta</title>
 </head>
 <body>
@@ -66,15 +76,21 @@ a{color:var(--accent)}
   display:flex; align-items:center; gap:6px; background:var(--mono-bg);
   border:1px solid var(--rule); border-radius:5px; padding:7px 10px;
 }
+.search:focus-within{border-color:var(--gold)}
 .search svg{flex:0 0 auto; opacity:.6}
 .search input{
   border:0; background:transparent; outline:0; width:100%; color:var(--ink);
   font-family:"PT Sans",sans-serif; font-size:13px;
 }
 .search input::placeholder{color:var(--ink-dim)}
+.search kbd{
+  font-family:"PT Sans",sans-serif; font-size:10px; color:var(--ink-dim);
+  border:1px solid var(--rule); border-radius:3px; padding:1px 5px; flex:0 0 auto;
+}
 .hitcount{font-family:"PT Sans",sans-serif; font-size:10.5px; color:var(--ink-dim); margin-top:6px; min-height:14px}
+.hitcount b{color:var(--gold)}
 
-.rail-list{flex:1 1 auto; overflow-y:auto; padding:6px 0 10px}
+.rail-list{flex:1 1 auto; overflow-y:auto; padding:6px 0 10px; -webkit-overflow-scrolling:touch}
 .section-label{
   font-family:"PT Sans",sans-serif; font-size:10.5px; font-weight:700;
   letter-spacing:.12em; text-transform:uppercase; color:var(--gold);
@@ -89,8 +105,16 @@ a{color:var(--accent)}
 .doclink.active{
   background:var(--mono-bg); border-left-color:var(--accent); font-weight:700;
 }
+.doclink.void{opacity:.6}
 .doclink mark{background:var(--mark); color:inherit; padding:0 1px; border-radius:2px}
 .doclink .snippet{display:block; font-family:"PT Sans",sans-serif; font-size:11px; color:var(--ink-dim); margin-top:2px; font-weight:400}
+.doclink .tag{
+  display:inline-block; font-family:"PT Sans",sans-serif; font-size:9.5px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; border:1px solid var(--rule);
+  color:var(--ink-dim); border-radius:2px; padding:0 4px; margin-left:6px;
+  vertical-align:1px;
+}
+.doclink .tag.void{border-color:var(--accent); color:var(--accent)}
 
 .rail-foot{border-top:1px solid var(--rule); padding:10px 14px; font-family:"PT Sans",sans-serif}
 .ai-toggle{
@@ -117,14 +141,26 @@ a{color:var(--accent)}
   display:flex; justify-content:space-between; align-items:center; gap:10px;
   font-family:"PT Sans",sans-serif; font-size:11px; color:var(--ink-dim);
   letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px;
+  flex-wrap:wrap;
 }
+.topline .tools{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 .copy-btn{
   font-family:"PT Sans",sans-serif; font-size:11px; border:1px solid var(--rule);
   background:var(--paper); color:var(--ink-dim); border-radius:4px; padding:5px 10px;
-  cursor:pointer;
+  cursor:pointer; text-decoration:none; letter-spacing:0; text-transform:none;
 }
 .copy-btn:hover{border-color:var(--gold); color:var(--gold)}
-.doc-title{font-size:clamp(22px,3vw,30px); line-height:1.25; margin:0 0 20px; text-wrap:balance; font-weight:700}
+.doc-title{font-size:clamp(22px,3vw,30px); line-height:1.25; margin:0 0 8px; text-wrap:balance; font-weight:700}
+.doc-sub{
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  font-family:"PT Sans",sans-serif; font-size:11.5px; color:var(--ink-dim);
+  margin:0 0 18px;
+}
+.status-tag{
+  font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  border:1px solid var(--gold); color:var(--gold); border-radius:3px; padding:2px 6px;
+}
+.status-tag.void{border-color:var(--accent); color:var(--accent)}
 .doc-body{
   background:var(--paper); border:1px solid var(--rule); border-radius:3px;
   padding:clamp(18px,4vw,40px); white-space:pre-wrap; word-wrap:break-word;
@@ -152,6 +188,15 @@ a{color:var(--accent)}
   color:var(--ink-dim); font-family:"PT Sans",sans-serif; font-size:13.5px; padding-top:10px;
 }
 .empty b{color:var(--ink); font-family:"PT Serif",serif; font-size:17px}
+.stats{display:flex; gap:26px; flex-wrap:wrap; margin:8px 0 4px}
+.stats .n{display:block; font-family:"PT Serif",serif; font-size:22px; color:var(--ink); line-height:1.1}
+.stats .k{font-size:11px; text-transform:uppercase; letter-spacing:.08em}
+.quick{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+.quick a{
+  font-family:"PT Sans",sans-serif; font-size:12px; text-decoration:none;
+  border:1px solid var(--rule); border-radius:4px; padding:6px 10px; color:var(--ink);
+}
+.quick a:hover{border-color:var(--gold); color:var(--gold)}
 
 /* ---- AI drawer ---- */
 .drawer-backdrop{
@@ -173,7 +218,7 @@ a{color:var(--accent)}
 }
 .drawer-head h2{margin:0 0 4px; font-size:17px}
 .drawer-head p{margin:0; font-family:"PT Sans",sans-serif; font-size:12px; color:var(--ink-dim); line-height:1.5}
-.drawer-close{background:transparent; border:0; color:var(--ink-dim); font-size:20px; cursor:pointer; line-height:1}
+.drawer-close{background:transparent; border:0; color:var(--ink-dim); font-size:20px; cursor:pointer; line-height:1; padding:0 4px}
 .drawer-body{flex:1 1 auto; overflow-y:auto; padding:14px 18px; font-family:"PT Sans",sans-serif}
 .drawer-body label{display:block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); margin:14px 0 6px}
 .drawer-body label:first-child{margin-top:0}
@@ -203,6 +248,7 @@ a{color:var(--accent)}
   z-index:60;
 }
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+body.no-scroll{overflow:hidden}
 
 @media (max-width:780px){
   .app{flex-direction:column}
@@ -217,7 +263,7 @@ a{color:var(--accent)}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=PT+Sans:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
 
 <div class="app">
-  <nav class="rail">
+  <nav class="rail" aria-label="Список документов">
     <div class="rail-head">
       <div class="brand">
         <span class="mark">SA</span>
@@ -225,17 +271,18 @@ a{color:var(--accent)}
       </div>
       <p class="brand-sub">Законодательная база сервера Murrieta · полные тексты</p>
       <div class="search">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="searchInput" type="text" placeholder="Поиск по статьям и документам…" autocomplete="off">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Поиск по статьям и документам…" autocomplete="off" spellcheck="false" aria-label="Поиск по документам">
+        <kbd id="searchKbd" aria-hidden="true">/</kbd>
       </div>
-      <div class="hitcount" id="hitcount"></div>
+      <div class="hitcount" id="hitcount" aria-live="polite"></div>
     </div>
     <div class="rail-list" id="railList"></div>
     <div class="rail-foot">
-      <button class="ai-toggle" id="aiToggle">
-        <span>⚖ Промпт для ИИ‑прокурора</span><span>›</span>
+      <button class="ai-toggle" id="aiToggle" aria-haspopup="dialog" aria-controls="drawer">
+        <span>⚖ Промпт для ИИ‑прокурора</span><span aria-hidden="true">›</span>
       </button>
-      <div class="theme-row">
+      <div class="theme-row" role="group" aria-label="Оформление">
         <button class="theme-btn" data-theme-choice="light">Светлая</button>
         <button class="theme-btn" data-theme-choice="dark">Тёмная</button>
         <button class="theme-btn active" data-theme-choice="system">Система</button>
@@ -251,10 +298,10 @@ a{color:var(--accent)}
 </div>
 
 <div class="drawer-backdrop" id="backdrop"></div>
-<aside class="drawer" id="drawer">
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
   <div class="drawer-head">
     <div>
-      <h2>Промпт для ИИ</h2>
+      <h2 id="drawerTitle">Промпт для ИИ</h2>
       <p>Скопируйте в системный промпт любой нейросети — она получит полный контекст законодательства Murrieta и инструкцию, как им пользоваться.</p>
     </div>
     <button class="drawer-close" id="drawerClose" aria-label="Закрыть">✕</button>
@@ -274,24 +321,32 @@ a{color:var(--accent)}
       <button class="btn" id="copyAll">Скопировать весь свод текстом</button>
     </div>
     <p class="note">
-      Для ИИ‑агентов: документ открывается напрямую по адресу вида <code>#codex-1</code> (раздел‑номер — см. список слева).
+      Для ИИ‑агентов: каждый документ открывается напрямую по адресу вида <code>#codex-1</code> (раздел‑номер — см. список слева).
       Полные данные доступны программно по относительному пути <code>docs.json</code> (JSON‑массив объектов
       <code>{id, section, sectionName, title, text}</code>) — модель с доступом к открытой странице может получить его через <code>fetch</code>.
       Если инструмент модели читает веб‑страницы постранично и обрезает большой <code>docs.json</code> (2+ МБ), используйте лёгкие
       статичные страницы: <a href="docs/index.html" target="_blank" rel="noopener">список всех документов (docs/index.html)</a>,
       конкретный документ — <code>docs/&lt;id&gt;.html</code>
-      (например <code>docs/codex-2.html</code>) с полным текстом без сокращений на одной странице.
+      (например <a href="docs/codex-2.html" target="_blank" rel="noopener">docs/codex-2.html</a>) с полным текстом без сокращений на одной странице.
     </p>
   </div>
 </aside>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<noscript>
+  <div style="max-width:760px;margin:40px auto;padding:0 18px;font-family:Arial,sans-serif;color:#201c14;background:#f3efe6">
+    <h1>Кодекс Murrieta</h1>
+    <p>Для работы поиска нужен JavaScript. Полный список документов со статичными страницами доступен
+    без него: <a href="docs/index.html">оглавление базы</a>.</p>
+  </div>
+</noscript>
 
 <script>
 (function(){
   "use strict";
 
-  var SECTION_ORDER = ["course","casebook","codex","law","precedent","appeal"];
+  var SECTION_ORDER = ["codex","law","precedent","appeal","casebook","course"];
   var SECTION_LABEL = {
     codex:"Кодексы", law:"Законы", precedent:"Судебные прецеденты и толкования",
     appeal:"Решения Верховного суда по обращениям",
@@ -309,63 +364,160 @@ a{color:var(--accent)}
   var hitcount = document.getElementById('hitcount');
 
   function escapeHtml(s){
-    return s.replace(/[&<>"]/g, function(c){
+    return String(s).replace(/[&<>"]/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
     });
   }
   function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+  function plural(n, one, few, many){
+    var n10 = n % 10, n100 = n % 100;
+    if(n10 === 1 && n100 !== 11) return one;
+    if(n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+    return many;
+  }
 
-  function highlight(text, q){
-    if(!q) return escapeHtml(text);
-    var re = new RegExp('(' + escapeRe(q) + ')', 'ig');
+  /* ---------- статус и дата документа (правила общие с build.py) ---------- */
+
+  function statusOf(doc){
+    if(/утратил\s+силу/i.test(doc.title)) return 'void';
+    if(/на\s+рассмотрении/i.test(doc.title)) return 'pending';
+    return 'active';
+  }
+  function dateOf(doc){
+    // без \b: в JS \b считается по \w (латиница), поэтому с кириллицей не работает
+    var m = /(?:^|\s)от\s+(\d{2})\.(\d{2})\.(\d{4})/.exec(doc.title);
+    return m ? m[1] + '.' + m[2] + '.' + m[3] : '';
+  }
+
+  /* ---------- поиск: русская морфология без внешних библиотек ---------- */
+
+  // Окончания, которые отрезаются от слова запроса, чтобы «убийство» находило
+  // «убийства», «лицензия» — «лицензии», «статья» — «статьи».
+  var RU_ENDINGS = [
+    'иями','ями','ами','ов','ев','ий','ый','ой','ая','ое','ые','ых','им','ым','ом','ем',
+    'ах','ях','ам','ям','ия','ии','ию','ей','ья','ье','а','я','о','е','у','ю','ы','и','ь','й'
+  ];
+
+  function stemRu(word){
+    var w = word.toLowerCase();
+    // цифры, латиница и пунктуация не трогаем — по ним ищут точным совпадением
+    if(!/[а-яё]/.test(w)) return w;
+    for(var i = 0; i < RU_ENDINGS.length; i++){
+      var end = RU_ENDINGS[i];
+      if(w.length - end.length >= 4 && w.slice(-end.length) === end){
+        return w.slice(0, -end.length);
+      }
+    }
+    return w;
+  }
+
+  // Собирает регулярку из запроса: каждое слово усекается до основы и получает
+  // право на 0..3 буквы окончания, слова разделяются пробелами/дефисами.
+  function buildPattern(q){
+    var tokens = q.trim().toLowerCase().split(/\s+/).filter(Boolean).slice(0,6);
+    if(!tokens.length) return null;
+    var parts = tokens.map(function(t){
+      var stem = stemRu(t);
+      var body = escapeRe(stem);
+      if(stem.length >= 4) body += '[а-яё]{0,3}';
+      return body;
+    });
+    return parts.join('[\\s\\-–—]{1,3}');
+  }
+
+  function makeRe(pattern, flags){
+    if(!pattern) return null;
+    try { return new RegExp(pattern, flags || 'gi'); } catch(e){ return null; }
+  }
+
+  // Подсветка: split() с одной внешней группой захвата — нечётные части это совпадения.
+  // Паттерн всегда оборачивается в скобки здесь, а не снаружи, иначе совпадения теряются.
+  function highlight(text, pattern){
+    if(!pattern) return escapeHtml(text);
+    var re;
+    try { re = new RegExp('(' + pattern + ')', 'gi'); } catch(e){ return escapeHtml(text); }
     var parts = text.split(re);
     var out = '';
-    for(var i=0;i<parts.length;i++){
-      out += (i % 2 === 1) ? '<mark>'+escapeHtml(parts[i])+'</mark>' : escapeHtml(parts[i]);
+    for(var i = 0; i < parts.length; i++){
+      out += (i % 2 === 1) ? '<mark>' + escapeHtml(parts[i]) + '</mark>' : escapeHtml(parts[i]);
     }
     return out;
   }
 
-  function snippetAround(text, q){
-    var idx = text.toLowerCase().indexOf(q.toLowerCase());
-    if(idx < 0) return '';
-    var start = Math.max(0, idx - 40);
-    var end = Math.min(text.length, idx + q.length + 60);
-    var s = (start>0?'…':'') + text.slice(start,end).replace(/\s+/g,' ').trim() + (end<text.length?'…':'');
+  function snippetAround(text, re){
+    if(!re) return '';
+    re.lastIndex = 0;
+    var m = re.exec(text);
+    if(!m) return '';
+    var start = Math.max(0, m.index - 45);
+    var end = Math.min(text.length, m.index + m[0].length + 70);
+    var s = (start > 0 ? '…' : '') + text.slice(start, end).replace(/\s+/g,' ').trim() + (end < text.length ? '…' : '');
     return s;
+  }
+
+  /* ---------- список слева ---------- */
+
+  function docTitleHtml(d, pattern){
+    var html = highlight(d.title, pattern);
+    var st = statusOf(d);
+    if(st === 'void') html += '<span class="tag void">утратил силу</span>';
+    else if(st === 'pending') html += '<span class="tag">на рассмотрении</span>';
+    return html;
   }
 
   function renderList(){
     var q = searchInput.value.trim();
-    var ql = q.toLowerCase();
+    var pattern = q ? buildPattern(q) : null;
+    var testRe = q ? makeRe(pattern, 'i') : null;
     var html = '';
     var total = 0;
+
     SECTION_ORDER.forEach(function(sec){
       var items = DOCS.filter(function(d){ return d.section === sec; });
-      var filtered = items.filter(function(d){
-        if(!ql) return true;
-        return d.title.toLowerCase().indexOf(ql) >= 0 || d.text.toLowerCase().indexOf(ql) >= 0;
+      var filtered = !q ? items : items.filter(function(d){
+        if(!testRe) return false;
+        return testRe.test(d.title) || testRe.test(d.text);
       });
       if(!filtered.length) return;
-      html += '<div class="section-label">'+escapeHtml(SECTION_LABEL[sec])+'</div>';
+
+      if(q && testRe){
+        // документы, где совпал заголовок, — выше
+        filtered = filtered.slice().sort(function(a, b){
+          var at = testRe.test(a.title) ? 0 : 1;
+          var bt = testRe.test(b.title) ? 0 : 1;
+          return at - bt;
+        });
+      }
+
+      html += '<div class="section-label">' + escapeHtml(SECTION_LABEL[sec]) + '</div>';
       filtered.forEach(function(d){
         total++;
         var active = current && current.id === d.id ? ' active' : '';
-        var snip = ql ? snippetAround(d.text, q) : '';
-        html += '<button class="doclink'+active+'" data-id="'+d.id+'">'
-              + highlight(d.title, ql ? q : '')
-              + (snip ? '<span class="snippet">'+highlight(snip, q)+'</span>' : '')
+        var cls = 'doclink' + active + (statusOf(d) === 'void' ? ' void' : '');
+        var snip = q ? snippetAround(d.text, makeRe(pattern, 'gi')) : '';
+        html += '<button class="' + cls + '" data-id="' + escapeHtml(d.id) + '">'
+              + docTitleHtml(d, pattern)
+              + (snip ? '<span class="snippet">' + highlight(snip, pattern) + '</span>' : '')
               + '</button>';
       });
     });
+
     railList.innerHTML = html || '<div class="section-label">Ничего не найдено</div>';
-    hitcount.textContent = ql ? (total + (total===1?' документ':' документ(ов)') + ' найдено') : (DOCS.length + ' документов в базе');
+    if(q){
+      hitcount.innerHTML = total
+        ? ('<b>' + total + '</b> ' + plural(total,'документ','документа','документов') + ' найдено')
+        : 'Ничего не найдено';
+    } else {
+      hitcount.innerHTML = DOCS.length + ' ' + plural(DOCS.length,'документ','документа','документов') + ' в базе';
+    }
     Array.prototype.forEach.call(railList.querySelectorAll('.doclink'), function(btn){
       btn.addEventListener('click', function(){
         location.hash = btn.getAttribute('data-id');
       });
     });
   }
+
+  /* ---------- навигация по совпадениям внутри документа ---------- */
 
   var hitIndex = -1;
   var hitMarks = [];
@@ -374,15 +526,11 @@ a{color:var(--accent)}
     var el = document.getElementById('hitNav');
     if(!el) return;
     var n = hitMarks.length;
-    if(n === 0){
-      el.innerHTML = '';
-      return;
-    }
-    var cur = hitIndex + 1;
+    if(n === 0){ el.innerHTML = ''; return; }
     el.innerHTML =
       '<div class="hit-nav">'
       + '<button type="button" id="hitPrev" title="Предыдущее (↑)">▲</button>'
-      + '<span class="hit-count">'+cur+' / '+n+'</span>'
+      + '<span class="hit-count">' + (hitIndex + 1) + ' / ' + n + '</span>'
       + '<button type="button" id="hitNext" title="Следующее (↓)">▼</button>'
       + '</div>';
     document.getElementById('hitPrev').addEventListener('click', function(){ stepHit(-1); });
@@ -404,77 +552,131 @@ a{color:var(--accent)}
     setCurrentHit(hitIndex + delta);
   }
 
+  /* ---------- карточка документа ---------- */
+
   function renderDoc(d, q){
     current = d;
     hitIndex = -1;
     hitMarks = [];
-    var body = q ? highlight(d.text, q) : escapeHtml(d.text);
+    var pattern = q ? buildPattern(q) : null;
+    var body = highlight(d.text, pattern);
     var hitBar = q ? '<div id="hitNav" style="margin:0 0 12px"></div>' : '';
+    var st = statusOf(d);
+    var dt = dateOf(d);
+    var sub = '';
+    if(dt) sub += '<span>' + escapeHtml(dt) + '</span>';
+    if(st === 'void') sub += '<span class="status-tag void">утратил силу</span>';
+    else if(st === 'pending') sub += '<span class="status-tag">на рассмотрении</span>';
+
     sheet.innerHTML =
-      '<div class="topline"><span>'+escapeHtml(SECTION_LABEL[d.section])+'</span>'
-      + '<button class="copy-btn" id="copyDocBtn">Копировать текст</button></div>'
-      + '<h1 class="doc-title">'+escapeHtml(d.title)+'</h1>'
+      '<div class="topline"><span>' + escapeHtml(SECTION_LABEL[d.section]) + '</span>'
+      + '<span class="tools">'
+      + '<a class="copy-btn" href="docs/' + encodeURIComponent(d.id) + '.html" target="_blank" rel="noopener">Постоянная ссылка</a>'
+      + '<button class="copy-btn" id="copyDocBtn">Копировать текст</button>'
+      + '</span></div>'
+      + '<h1 class="doc-title">' + escapeHtml(d.title) + '</h1>'
+      + (sub ? '<p class="doc-sub">' + sub + '</p>' : '')
       + hitBar
-      + '<div class="doc-body">'+body+'</div>';
+      + '<div class="doc-body">' + body + '</div>';
+
     document.getElementById('copyDocBtn').addEventListener('click', function(){
       copyText(d.title + '\n\n' + d.text, 'Текст документа скопирован');
     });
     if(q){
       hitMarks = Array.prototype.slice.call(sheet.querySelectorAll('.doc-body mark'));
-      if(hitMarks.length){
-        setCurrentHit(0);
-      } else {
-        updateHitNav();
-      }
+      if(hitMarks.length) setCurrentHit(0);
+      else updateHitNav();
     }
   }
 
   function renderEmpty(){
     current = null;
+    var counts = SECTION_ORDER.map(function(sec){
+      var n = DOCS.filter(function(d){ return d.section === sec; }).length;
+      return n ? {sec: sec, n: n} : null;
+    }).filter(Boolean);
+    var total = DOCS.length;
+    var words = 0;
+    DOCS.forEach(function(d){ words += d.text.split(/\s+/).length; });
+    var stats = counts.map(function(c){
+      return '<div><span class="n">' + c.n + '</span><span class="k">' + escapeHtml(SECTION_LABEL[c.sec]) + '</span></div>';
+    }).join('');
     sheet.innerHTML =
       '<div class="empty">'
       + '<b>Выберите документ слева</b>'
       + '<span>Полная законодательная база сервера Murrieta: кодексы, законы, судебные прецеденты и решения Верховного суда по обращениям — без сокращений, в одном месте.</span>'
+      + (stats ? '<div class="stats">' + stats + '</div>' : '')
+      + (total ? '<span>' + total + ' ' + plural(total,'документ','документа','документов') + ' · около ' + Math.round(words / 1000) + ' тыс. слов</span>' : '<span>Загрузка базы…</span>')
+      + '<div class="quick"><a href="docs/index.html">Оглавление базы</a>'
+      + (DOCS.length ? '<a href="#' + encodeURIComponent(DOCS[0].id) + '">Начать с Конституции</a>' : '')
+      + '</div>'
       + '<span>Нажмите «⚖ Промпт для ИИ‑прокурора», чтобы получить готовый системный промпт для работы с этой базой в любой нейросети.</span>'
       + '</div>';
   }
 
   function applyHash(){
-    var id = location.hash.replace('#','');
+    var id = '';
+    try { id = decodeURIComponent(location.hash.replace(/^#/, '')); } catch(e){ id = location.hash.replace(/^#/, ''); }
     var q = searchInput.value.trim();
     if(id && byId[id]){
       renderDoc(byId[id], q);
+      if(!q) window.scrollTo(0,0);
     } else {
       renderEmpty();
-      window.scrollTo(0,0);
     }
     renderList();
-    if(!q && id){ window.scrollTo(0,0); }
   }
 
+  /* ---------- поиск: ввод с задержкой ---------- */
+
+  var searchTimer = null;
   searchInput.addEventListener('input', function(){
-    renderList();
-    if(current){
-      renderDoc(current, searchInput.value.trim());
+    clearTimeout(searchTimer);
+    var kbd = document.getElementById('searchKbd');
+    if(kbd) kbd.style.visibility = searchInput.value ? 'hidden' : 'visible';
+    searchTimer = setTimeout(function(){
+      renderList();
+      if(current) renderDoc(current, searchInput.value.trim());
+    }, 140);
+  });
+  searchInput.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      if(searchInput.value){
+        searchInput.value = '';
+        var kbd = document.getElementById('searchKbd');
+        if(kbd) kbd.style.visibility = 'visible';
+        renderList();
+        if(current) renderDoc(current, '');
+      } else {
+        searchInput.blur();
+      }
+      e.preventDefault();
     }
   });
 
   document.addEventListener('keydown', function(e){
-    if(!hitMarks.length) return;
     var tag = (e.target && e.target.tagName) || '';
-    if(tag === 'INPUT' || tag === 'TEXTAREA') return;
-    if(e.key === 'ArrowDown' || e.key === 'F3' && !e.shiftKey){
+    var inField = tag === 'INPUT' || tag === 'TEXTAREA';
+
+    if(e.key === '/' && !inField && !e.ctrlKey && !e.metaKey && !e.altKey){
       e.preventDefault();
-      stepHit(1);
-    } else if(e.key === 'ArrowUp' || (e.key === 'F3' && e.shiftKey)){
+      searchInput.focus();
+      searchInput.select();
+      return;
+    }
+    if(inField) return;
+
+    var next = e.key === 'ArrowDown' || (e.key === 'F3' && !e.shiftKey);
+    var prev = e.key === 'ArrowUp' || (e.key === 'F3' && e.shiftKey);
+    if((next || prev) && hitMarks.length){
       e.preventDefault();
-      stepHit(-1);
+      stepHit(next ? 1 : -1);
     }
   });
 
   window.addEventListener('hashchange', applyHash);
 
-  // ---- toast ----
+  /* ---------- toast ---------- */
   var toastEl = document.getElementById('toast');
   var toastTimer = null;
   function toast(msg){
@@ -498,15 +700,33 @@ a{color:var(--accent)}
     } else { fallback(); }
   }
 
-  // ---- AI drawer ----
+  /* ---------- AI drawer ---------- */
   var drawer = document.getElementById('drawer');
   var backdrop = document.getElementById('backdrop');
-  document.getElementById('aiToggle').addEventListener('click', function(){
-    drawer.classList.add('open'); backdrop.classList.add('open');
-  });
+  var lastFocused = null;
+
+  function openDrawer(){
+    lastFocused = document.activeElement;
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+    document.getElementById('promptBox').focus();
+  }
+  function closeDrawer(){
+    if(!drawer.classList.contains('open')) return;
+    drawer.classList.remove('open');
+    backdrop.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
+    if(lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+  document.getElementById('aiToggle').addEventListener('click', openDrawer);
   document.getElementById('drawerClose').addEventListener('click', closeDrawer);
   backdrop.addEventListener('click', closeDrawer);
-  function closeDrawer(){ drawer.classList.remove('open'); backdrop.classList.remove('open'); }
+  drawer.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ e.preventDefault(); closeDrawer(); }
+  });
 
   var DEFAULT_PROMPT =
 "Ты — ИИ-юрист сервера Murrieta (GTA 5 RP, gta5rp.com). По умолчанию отвечаешь с позиции прокурора " +
@@ -572,6 +792,8 @@ a{color:var(--accent)}
 "ЭТАЛОН ТОЧНОСТИ (бери за образец методичку casebook-1 и курс академии):\n" +
 "— ссылка на норму всегда полная: документ → глава (номер/название) → статья → часть → пункт/подпункт " +
 "буквой, если так устроена статья, а не просто номер статьи без контекста;\n" +
+"— ссылку на документ оформляй ещё и постоянной ссылкой вида docs/<id>.html (например docs/codex-2.html), " +
+"чтобы читатель мог открыть первоисточник;\n" +
 "— если есть толкование/прецедент/решение Верховного суда, уточняющее или меняющее применение нормы — " +
 "указываешь его отдельно и явно, с номером обращения/прецедента;\n" +
 "— отличаешь похожие по номеру статьи составы (типичная ошибка игроков — путать смежные статьи) и прямо " +
@@ -620,21 +842,23 @@ a{color:var(--accent)}
   });
   document.getElementById('copyAll').addEventListener('click', function(){
     var all = DOCS.map(function(d){
-      return '### ['+SECTION_LABEL[d.section]+'] '+d.title+'\n\n'+d.text;
+      return '### [' + SECTION_LABEL[d.section] + '] ' + d.title + '\n\n' + d.text;
     }).join('\n\n----------------------------------------\n\n');
-    copyText(all, 'Весь свод скопирован ('+DOCS.length+' документов)');
+    copyText(all, 'Весь свод скопирован (' + DOCS.length + ' документов)');
   });
   document.getElementById('urlOut').textContent = location.href.replace(/#.*$/, '');
 
-  // ---- theme ----
+  /* ---------- тема ---------- */
   var themeBtns = document.querySelectorAll('.theme-btn');
   function setTheme(choice){
     if(choice === 'system'){ document.documentElement.removeAttribute('data-theme'); }
     else { document.documentElement.setAttribute('data-theme', choice); }
-    themeBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-theme-choice')===choice); });
+    Array.prototype.forEach.call(themeBtns, function(b){
+      b.classList.toggle('active', b.getAttribute('data-theme-choice') === choice);
+    });
     try{ localStorage.setItem('murrieta_codex_theme', choice); }catch(e){}
   }
-  themeBtns.forEach(function(b){
+  Array.prototype.forEach.call(themeBtns, function(b){
     b.addEventListener('click', function(){ setTheme(b.getAttribute('data-theme-choice')); });
   });
   try{
@@ -642,29 +866,49 @@ a{color:var(--accent)}
     if(savedTheme) setTheme(savedTheme);
   }catch(e){}
 
-  // ---- boot ----
+  /* ---------- загрузка ---------- */
+  function boot(data){
+    DOCS = data.slice().sort(function(a, b){
+      var ia = SECTION_ORDER.indexOf(a.section), ib = SECTION_ORDER.indexOf(b.section);
+      if(ia !== ib) return ia - ib;
+      var na = parseInt((a.id.split('-')[1] || '0'), 10);
+      var nb = parseInt((b.id.split('-')[1] || '0'), 10);
+      if(!isNaN(na) && !isNaN(nb) && na !== nb) return na - nb;
+      return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+    });
+    DOCS.forEach(function(d){ byId[d.id] = d; });
+    if(!location.hash && DOCS.length){
+      try{ history.replaceState(null, '', '#' + DOCS[0].id); }catch(e){}
+    }
+    applyHash();
+  }
+
+  function fail(){
+    railList.innerHTML = '<div class="section-label">Не удалось загрузить базу</div>';
+    sheet.innerHTML = '<div class="empty"><b>База не загрузилась</b>'
+      + '<span>Проверьте соединение и обновите страницу. Оглавление со статичными копиями документов '
+      + 'доступно <a href="docs/index.html">здесь</a>.</span></div>';
+  }
+
   renderEmpty();
   loadPrompt();
-  var parts = ['codex.json','law.json','appeal.json','other.json'];
-  Promise.all(parts.map(function(u){
-    return fetch(u).then(function(r){
-      if(!r.ok) throw new Error(u);
-      return r.json();
-    });
-  })).then(function(chunks){
-    DOCS = [].concat.apply([], chunks);
-    DOCS.forEach(function(d){ byId[d.id] = d; });
-    applyHash();
-  }).catch(function(e){
-    // fallback to single docs.json
-    return fetch('docs.json').then(function(r){ return r.json(); }).then(function(data){
-      DOCS = data;
-      DOCS.forEach(function(d){ byId[d.id] = d; });
-      applyHash();
-    });
-  }).catch(function(){
-    railList.innerHTML = '<div class="section-label">Не удалось загрузить базу</div>';
-  });
+
+  fetch('docs.json', {cache: 'no-cache'})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .catch(function(){
+      // запасной путь: порезанная база
+      return Promise.all(['codex.json','law.json','appeal.json','other.json'].map(function(u){
+        return fetch(u, {cache: 'no-cache'}).then(function(r){
+          if(!r.ok) throw new Error(u);
+          return r.json();
+        });
+      })).then(function(chunks){ return [].concat.apply([], chunks); });
+    })
+    .then(function(data){
+      if(!data || !data.length) throw new Error('empty');
+      boot(data);
+    })
+    .catch(fail);
 })();
 </script>
 

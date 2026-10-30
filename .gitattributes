@@ -1,0 +1,12 @@
+# Держим LF во всех текстовых файлах: build.py --check сравнивает байты,
+# и CRLF в рабочей копии ломал бы проверку на Windows.
+* text=auto eol=lf
+*.py text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf
+_headers text eol=lf
