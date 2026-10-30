@@ -352,141 +352,253 @@ def build_404():
     return page("Страница не найдена — %s" % SITE_NAME, "Страница не найдена.", body)
 
 
-# ----------------------------------------------------------------------------- статьи кодексов
+# ----------------------------------------------------------------------------- статьи кодексов и навигация
 
-# Статьи УАК в тексте начинаются с номера, иногда после маркера юрисдикции.
-RE_ARTICLE = re.compile(r"^(?:[\U0001F7E5\U0001F7E9\U0001F7E8]\s*)?(\d+\.\d+(?:\.\d+)*)\.?\s*\S")
-RE_CHAPTER = re.compile(r"^Глава\s+(\d+(?:\.\d+)?)\.\s*(.+?)\s*$")
+# УАК нумерует статьи как 12.8 / 12.8.1, иногда с маркером юрисдикции впереди.
+RE_ARTICLE_DOTTED = re.compile(r"^(?:[\U0001F7E5\U0001F7E9\U0001F7E8]\s*)?(\d+\.\d+(?:\.\d+)*)\.?\s*\S")
+# остальные кодексы — «Статья 12. Текст».
+RE_ARTICLE_STAT = re.compile(r"^\s*Статья\s+(\d+(?:\.\d+)*)\.", re.M)
+RE_CHAPTER = re.compile(r"^\s*(?:Глава|Раздел)\s+([IVXLCDM]+|\d+(?:\.\d+)?)[\.\s]*(.*?)\s*$")
 RE_ART_IN_TEXT = re.compile(r"(?<![\d.])(\d+\.\d+(?:\.\d+)*)(?![\d.])")
 
-# id кодекса -> папка со страницами статей и подпись
-CODEBOOKS = {
-    "codex-2": ("uak", "Уголовно-административный кодекс"),
-}
+# id кодекса -> (папка, короткое имя, режим разбивки)
+#   dotted  — статьи вида 12.8 (нумерация уникальна по всему кодексу)
+#   article — «Статья N.» с уникальной нумерацией
+#   chapter — нумерация статей своя в каждой главе, поэтому режем по главам
+CODEBOOKS = [
+    ("codex-2", "uak", "УАК", "dotted"),
+    ("codex-1", "konst", "Конституции", "article"),
+    ("codex-3", "pk", "ПК", "chapter"),
+    ("codex-4", "sud", "СК", "chapter"),
+    ("codex-5", "trud", "ТК", "article"),
+]
 
 
-def parse_articles(text):
-    """Режет кодекс на статьи: номер, глава, текст."""
+def parse_document(text, mode):
+    """Режет кодекс на части: статьи или главы."""
     lines = text.split("\n")
+
+    if mode == "chapter":
+        marks = []
+        for i, ln in enumerate(lines):
+            m = RE_CHAPTER.match(ln)
+            if m:
+                marks.append((i, m.group(1), (m.group(2) or "").strip()))
+        parts = []
+        for k, (start, key, title) in enumerate(marks):
+            end = marks[k + 1][0] if k + 1 < len(marks) else len(lines)
+            body = "\n".join(lines[start:end]).strip()
+            parts.append({
+                "key": key,
+                "title": title,
+                "text": body,
+                "articles": RE_ARTICLE_STAT.findall(body),
+            })
+        return parts
+
+    re_art = RE_ARTICLE_DOTTED if mode == "dotted" else RE_ARTICLE_STAT
     chapter = ""
-    found = []  # (line_index, num, chapter_at_that_point)
+    marks = []
     for i, ln in enumerate(lines):
         m_ch = RE_CHAPTER.match(ln)
         if m_ch:
-            chapter = "Глава %s. %s" % (m_ch.group(1), m_ch.group(2))
+            chapter = "Глава %s%s" % (m_ch.group(1), (". " + m_ch.group(2)) if m_ch.group(2) else "")
             continue
-        m = RE_ARTICLE.match(ln)
+        m = re_art.match(ln)
         if m:
-            found.append((i, m.group(1), chapter))
-    articles = []
-    for k, (start, num, chap) in enumerate(found):
-        end = found[k + 1][0] if k + 1 < len(found) else len(lines)
-        body = "\n".join(lines[start:end]).strip()
-        articles.append({"num": num, "chapter": chap, "text": body})
-    return articles
+            marks.append((i, m.group(1), chapter))
+
+    parts = []
+    for k, (start, num, chap) in enumerate(marks):
+        end = marks[k + 1][0] if k + 1 < len(marks) else len(lines)
+        parts.append({
+            "key": num,
+            "title": chap,
+            "text": "\n".join(lines[start:end]).strip(),
+            "articles": [num],
+        })
+    return parts
 
 
-def article_refs(articles, docs):
-    """Для каждой статьи — документы базы, где она упоминается."""
-    # один проход по всем документам: собираем, где какие номера встречаются
+def part_heading(part, short, mode):
+    if mode == "chapter":
+        return "Глава %s. %s" % (part["key"], part["title"]) if part["title"] else "Глава %s" % part["key"]
+    return "Ст. %s %s" % (part["key"], short)
+
+
+def part_title_line(part, mode):
+    """Первая содержательная строка — для оглавления и описания."""
+    line = part["text"].split("\n")[0]
+    if mode == "chapter":
+        line = RE_CHAPTER.sub("", line).strip()
+        line = line.lstrip(".").strip()
+    else:
+        re_art = RE_ARTICLE_DOTTED if mode == "dotted" else RE_ARTICLE_STAT
+        line = re_art.sub("", line).strip()
+    return line.lstrip("*").strip()[:130]
+
+
+def article_refs(parts, docs, mode):
+    """Для каждой статьи — документы базы, где она упоминается (только УАК)."""
+    if mode != "dotted":
+        return {}
     where = {}
     for d in docs:
         if d["id"].startswith("codex-"):
             continue
         for num in set(RE_ART_IN_TEXT.findall(d["text"])):
             where.setdefault(num, []).append(d)
+    weight = {"appeal": 0, "precedent": 1, "method": 2, "casebook": 3, "course": 4}
     refs = {}
-    for a in articles:
-        items = where.get(a["num"], [])
-        # сначала толкования и прецеденты, потом методички
-        weight = {"appeal": 0, "precedent": 1, "method": 2, "casebook": 3, "course": 4}
-        items = sorted(items, key=lambda d: weight.get(d["section"], 9))
-        refs[a["num"]] = items[:6]
+    for p in parts:
+        items = sorted(where.get(p["key"], []), key=lambda d: weight.get(d["section"], 9))
+        refs[p["key"]] = items[:6]
     return refs
 
 
-def article_title(a):
-    """Первая содержательная строка статьи — для заголовка страницы."""
-    line = a["text"].split("\n")[0]
-    line = RE_ARTICLE.sub(lambda m: "", line, count=1).strip()
-    line = line.lstrip("*").strip()
-    return line[:140]
-
-
-def build_article_pages(doc, folder, label, articles, refs):
+def build_code_pages(doc, folder, short, mode, docs):
+    parts = parse_document(doc["text"], mode)
+    refs = article_refs(parts, docs, mode)
     out = {}
-    for a in articles:
-        title_line = article_title(a)
-        meta = [esc(label), esc(a["chapter"])] if a["chapter"] else [esc(label)]
-        related = ""
-        items = refs.get(a["num"]) or []
+
+    for p in parts:
+        heading = part_heading(p, short, mode)
+        title_line = part_title_line(p, mode)
+        meta = [esc(short), esc(p["title"])] if p["title"] and mode != "chapter" else [esc(short)]
+
+        extra = ""
+        if mode == "chapter" and p["articles"]:
+            extra += (
+                '<p class="count">Статьи в главе: %s</p>\n' % esc(", ".join(p["articles"]))
+            )
+        items = refs.get(p["key"]) or []
         if items:
             links = "".join(
                 '<li><a href="../%s.html">%s</a></li>' % (esc(d["id"]), esc(d["title"])) for d in items
             )
-            related = (
-                "<h2>Где эта статья упоминается</h2>\n<ul class=\"docs\">" + links + "</ul>\n"
-            )
+            extra += '<h2>Где упоминается</h2>\n<ul class="docs">%s</ul>\n' % links
+
         body = (
             '<nav class="nav"><a href="../%s.html">&larr; %s</a>'
-            '<a href="index.html">Все статьи &rarr;</a></nav>\n'
+            '<a href="index.html">Оглавление &rarr;</a></nav>\n'
             '<div class="meta">%s</div>\n'
-            "<h1>Ст. %s УАК</h1>\n"
+            "<h1>%s</h1>\n"
             '<div class="body">%s</div>\n'
             "%s"
-            '<footer>Полный кодекс — <a href="../%s.html">docs/%s.html</a>. '
-            "База «%s».</footer>"
+            '<footer>Полный документ — <a href="../%s.html">docs/%s.html</a>. База «%s».</footer>'
             % (
-                esc(doc["id"]),
-                esc(doc["title"]),
-                " · ".join(meta),
-                esc(a["num"]),
-                esc(a["text"]),
-                related,
-                esc(doc["id"]),
-                esc(doc["id"]),
-                esc(SITE_NAME),
+                esc(doc["id"]), esc(doc["title"]), " · ".join(meta), esc(heading),
+                esc(p["text"]), extra, esc(doc["id"]), esc(doc["id"]), esc(SITE_NAME),
             )
         )
-        out["docs/%s/%s.html" % (folder, a["num"])] = page(
-            "Ст. %s УАК — %s" % (a["num"], SITE_NAME),
-            "%s. Статья %s Уголовно-административного кодекса Murrieta: полный текст."
-            % (title_line[:120], a["num"]),
+        out["docs/%s/%s.html" % (folder, p["key"])] = page(
+            "%s — %s" % (heading, SITE_NAME),
+            "%s. %s: полный текст." % (title_line[:110], heading),
             body,
-            canonical="%s/docs/%s/%s.html" % (SITE, folder, a["num"]),
+            canonical="%s/docs/%s/%s.html" % (SITE, folder, p["key"]),
         )
 
-    # оглавление по главам
-    chapters, order = {}, []
-    for a in articles:
-        ch = a["chapter"] or "Без главы"
-        if ch not in chapters:
-            chapters[ch] = []
-            order.append(ch)
-        chapters[ch].append(a)
-    parts = [
+    # оглавление
+    total_articles = sum(len(p["articles"]) for p in parts)
+    parts_html = [
         '<nav class="nav"><a href="../%s.html">&larr; %s</a>'
         '<a href="../index.html">Все документы &rarr;</a></nav>' % (esc(doc["id"]), esc(SITE_NAME)),
-        "<h1>Все статьи УАК</h1>",
-        '<p class="count">%d статей. Каждая — отдельной страницей: '
-        "docs/%s/&lt;номер&gt;.html</p>" % (len(articles), folder),
+        "<h1>%s — оглавление</h1>" % esc(doc["title"]),
+        '<p class="count">%d %s, %d статей. Адрес страницы: docs/%s/&lt;номер&gt;.html</p>'
+        % (len(parts), "глав" if mode == "chapter" else "частей", total_articles, folder),
     ]
-    for ch in order:
-        parts.append("<h2>%s</h2>" % esc(ch))
-        parts.append('<ul class="docs">')
-        for a in chapters[ch]:
-            parts.append(
-                '<li><a href="%s.html"><span class="n">%s</span>%s</a></li>'
-                % (esc(a["num"]), esc(a["num"]), esc(article_title(a)[:110]))
+    if mode == "chapter":
+        parts_html.append('<ul class="docs">')
+        for p in parts:
+            parts_html.append(
+                '<li><a href="%s.html"><span class="n">%s</span>%s <span class="count">(%s)</span></a></li>'
+                % (esc(p["key"]), esc(p["key"]), esc(p["title"] or "без названия"),
+                   esc(", ".join(p["articles"][:8]) + ("…" if len(p["articles"]) > 8 else "")) or "—")
             )
-        parts.append("</ul>")
+        parts_html.append("</ul>")
+    else:
+        chapter = None
+        for p in parts:
+            if p["title"] != chapter:
+                chapter = p["title"]
+                parts_html.append("<h2>%s</h2>" % esc(chapter or "Без главы"))
+                parts_html.append('<ul class="docs">')
+            parts_html.append(
+                '<li><a href="%s.html"><span class="n">%s</span>%s</a></li>'
+                % (esc(p["key"]), esc(p["key"]), esc(part_title_line(p, mode)[:110]))
+            )
+        parts_html.append("</ul>")
     out["docs/%s/index.html" % folder] = page(
-        "Все статьи УАК — %s" % SITE_NAME,
-        "Оглавление статей Уголовно-административного кодекса Murrieta: %d статей по главам." % len(articles),
-        "\n".join(parts),
+        "%s — оглавление — %s" % (doc["title"], SITE_NAME),
+        "Оглавление: %d статей %s." % (total_articles, doc["title"]),
+        "\n".join(parts_html),
         canonical="%s/docs/%s/index.html" % (SITE, folder),
     )
     return out
+
+
+def build_appeal_nav(docs):
+    """Индекс решений и толкований по номерам: №541 -> документ."""
+    rows = []
+    for d in docs:
+        if d["section"] not in ("appeal", "precedent"):
+            continue
+        m = re.search(r"№\s*(\d+)", d["title"])
+        if not m:
+            continue
+        rows.append((int(m.group(1)), d))
+    rows.sort(key=lambda r: r[0])
+
+    body = [
+        '<nav class="nav"><a href="../index.html">&larr; %s</a></nav>' % esc(SITE_NAME),
+        "<h1>Решения и толкования по номерам</h1>",
+        '<p class="count">%d документов. Если в вопросе есть номер (№541, толкование №468) — '
+        "открывай документ отсюда.</p>" % len(rows),
+        '<ul class="docs">',
+    ]
+    for num, d in rows:
+        mark = ""
+        if RE_VOID.search(d["title"]):
+            mark = ' <span class="badge void">утратил силу</span>'
+        body.append(
+            '<li><a href="%s.html"><span class="n">№%d</span>%s%s</a></li>'
+            % (esc(d["id"]), num, esc(d["title"]), mark)
+        )
+    body.append("</ul>")
+    return page(
+        "Решения и толкования по номерам — %s" % SITE_NAME,
+        "Индекс судебных решений и толкований Верховного суда Murrieta по номерам.",
+        "\n".join(body),
+        canonical="%s/docs/appeal-nav.html" % SITE,
+    )
+
+
+def build_text_index(docs):
+    """Плоский текстовый индекс для моделей: id, раздел, название, размер."""
+    lines = [
+        "КОДЕКС MURRIETA — ИНДЕКС БАЗЫ",
+        "Всего документов: %d." % len(docs),
+        "",
+        "Статьи УАК по номеру: docs/uak/<номер>.html   (например docs/uak/12.8.html)",
+        "Оглавление статей УАК: docs/uak/index.html",
+        "Статьи других кодексов: docs/pk/<глава>.html, docs/konst/<номер>.html, docs/sud/<глава>.html, docs/trud/<номер>.html",
+        "Решения и толкования по номерам: docs/appeal-nav.html",
+        "Методички по темам: docs/method-nav.html",
+        "Полный список документов: docs/index.html",
+        "",
+        "id | раздел | название | знаков | статус",
+        "-" * 90,
+    ]
+    for sec, label in SECTIONS:
+        for d in docs:
+            if d["section"] != sec:
+                continue
+            st = status_of(d)
+            lines.append(
+                "%s | %s | %s | %d | %s"
+                % (d["id"], label, d["title"], len(d["text"]), STATUS_LABEL.get(st) or "действует")
+            )
+    return "\n".join(lines) + "\n"
 
 
 # ----------------------------------------------------------------------------- сборка
@@ -515,17 +627,20 @@ def generate():
 
     out["docs/index.html"] = build_index_page(docs_sorted)
 
-    # страницы отдельных статей кодексов
+    # страницы отдельных статей и глав кодексов
     book_paths = []
-    for codex_id, (folder, label) in CODEBOOKS.items():
+    for codex_id, folder, short, mode in CODEBOOKS:
         src = next((d for d in docs_sorted if d["id"] == codex_id), None)
         if not src:
             continue
-        articles = parse_articles(src["text"])
-        refs = article_refs(articles, docs_sorted)
-        for path, content in build_article_pages(src, folder, label, articles, refs).items():
+        for path, content in build_code_pages(src, folder, short, mode, docs_sorted).items():
             out[path] = content
-            book_paths.append(path)
+            if path.endswith(".html"):
+                book_paths.append(path)
+
+    out["docs/appeal-nav.html"] = build_appeal_nav(docs_sorted)
+    book_paths.append("docs/appeal-nav.html")
+    out["docs/index.txt"] = build_text_index(docs_sorted)
 
     out["sitemap.xml"] = build_sitemap(docs_sorted, today, book_paths)
     out["404.html"] = build_404()
