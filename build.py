@@ -236,7 +236,10 @@ def badge(status):
 
 # ----------------------------------------------------------------------------- генераторы
 
-def build_doc_page(doc, prev_doc, next_doc):
+def build_doc_page(doc, prev_doc, next_doc, book_index=None):
+    book_link = ""
+    if book_index:
+        book_link = " Оглавление документа: <a href=\"%s\">по частям</a>." % esc(book_index)
     st = status_of(doc)
     d = date_of(doc)
     meta_bits = [esc(SECTION_LABEL[doc["section"]])]
@@ -270,7 +273,7 @@ def build_doc_page(doc, prev_doc, next_doc):
         '<div class="body">%s</div>\n'
         "%s\n"
         '<footer>Статическая копия документа из базы «%s». '
-        "Актуальная версия и поиск — <a href=\"../index.html#%s\">на главной странице</a>.</footer>"
+        "Актуальная версия и поиск — <a href=\"../index.html#%s\">на главной странице</a>.%s</footer>"
         % (
             esc(doc["id"]),
             esc(SITE_NAME),
@@ -280,6 +283,7 @@ def build_doc_page(doc, prev_doc, next_doc):
             "\n".join(pager),
             esc(SITE_NAME),
             esc(doc["id"]),
+            book_link,
         )
     )
     desc = "%s — %s. Полный текст без сокращений." % (
@@ -477,6 +481,8 @@ def build_code_pages(doc, folder, short, mode, docs):
     parts = parse_document(doc["text"], mode)
     refs = article_refs(parts, docs, mode)
     out = {}
+    # папка может быть вложенной (law/20), поэтому подъём до docs/ считается по глубине
+    up = "../" * (folder.count("/") + 1)
 
     for p in parts:
         heading = part_heading(p, short, mode)
@@ -491,7 +497,7 @@ def build_code_pages(doc, folder, short, mode, docs):
         items = refs.get(p["key"]) or []
         if items:
             links = "".join(
-                '<li><a href="../%s.html">%s</a></li>' % (esc(d["id"]), esc(d["title"])) for d in items
+                '<li><a href="%s%s.html">%s</a></li>' % (up, esc(d["id"]), esc(d["title"])) for d in items
             )
             extra += '<h2>Где упоминается</h2>\n<ul class="docs">%s</ul>\n' % links
 
@@ -500,16 +506,16 @@ def build_code_pages(doc, folder, short, mode, docs):
             body_text = RE_LEAD_NUMBER.sub("", body_text, count=1)
 
         body = (
-            '<nav class="nav"><a href="../%s.html">&larr; %s</a>'
+            '<nav class="nav"><a href="%s%s.html">&larr; %s</a>'
             '<a href="index.html">Оглавление &rarr;</a></nav>\n'
             '<div class="meta">%s</div>\n'
             "<h1>%s</h1>\n"
             '<div class="body">%s</div>\n'
             "%s"
-            '<footer>Полный документ — <a href="../%s.html">docs/%s.html</a>. База «%s».</footer>'
+            '<footer>Полный документ — <a href="%s%s.html">docs/%s.html</a>. База «%s».</footer>'
             % (
-                esc(doc["id"]), esc(doc["title"]), " · ".join(meta), esc(heading),
-                esc(body_text), extra, esc(doc["id"]), esc(doc["id"]), esc(SITE_NAME),
+                up, esc(doc["id"]), esc(doc["title"]), " · ".join(meta), esc(heading),
+                esc(body_text), extra, up, esc(doc["id"]), esc(doc["id"]), esc(SITE_NAME),
             )
         )
         out["docs/%s/%s.html" % (folder, p["key"])] = page(
@@ -522,11 +528,19 @@ def build_code_pages(doc, folder, short, mode, docs):
     # оглавление
     total_articles = sum(len(p["articles"]) for p in parts)
     parts_html = [
-        '<nav class="nav"><a href="../%s.html">&larr; %s</a>'
-        '<a href="../index.html">Все документы &rarr;</a></nav>' % (esc(doc["id"]), esc(SITE_NAME)),
+        '<nav class="nav"><a href="%s%s.html">&larr; %s</a>'
+        '<a href="%sindex.html">Все документы &rarr;</a></nav>'
+        % (up, esc(doc["id"]), esc(SITE_NAME), up),
         "<h1>%s — оглавление</h1>" % esc(doc["title"]),
-        '<p class="count">%d %s, %d статей. Адрес страницы: docs/%s/&lt;номер&gt;.html</p>'
-        % (len(parts), "глав" if mode == "chapter" else "частей", total_articles, folder),
+        '<p class="count">%d %s, %d %s. Адрес страницы: docs/%s/&lt;номер&gt;.html</p>'
+        % (
+            len(parts),
+            plural_ru(len(parts), "глава", "главы", "глав") if mode == "chapter"
+            else plural_ru(len(parts), "часть", "части", "частей"),
+            total_articles,
+            plural_ru(total_articles, "статья", "статьи", "статей"),
+            folder,
+        ),
     ]
     if mode == "chapter":
         parts_html.append('<ul class="docs">')
@@ -603,6 +617,7 @@ def build_text_index(docs):
         "Статьи УАК по номеру: docs/uak/<номер>.html   (например docs/uak/12.8.html)",
         "Оглавление статей УАК: docs/uak/index.html",
         "Статьи других кодексов: docs/pk/<глава>.html, docs/konst/<номер>.html, docs/sud/<глава>.html, docs/trud/<номер>.html",
+        "Законы по главам: docs/law/<номер закона>/index.html   (например docs/law/20/index.html — закон о прокуратуре)",
         "Решения и толкования по номерам: docs/appeal-nav.html",
         "Методички по темам: docs/method-nav.html",
         "Полный список документов: docs/index.html",
@@ -624,12 +639,44 @@ def build_text_index(docs):
 
 # ----------------------------------------------------------------------------- сборка
 
+def plan_books(docs_sorted):
+    """Что режем на части: кодексы и законы.
+
+    Для закона берём главы, если они есть (нумерация статей в законах часто
+    начинается заново в каждой главе), иначе — статьи, если номера уникальны.
+    """
+    plan = []
+    for codex_id, folder, short, mode in CODEBOOKS:
+        src = next((d for d in docs_sorted if d["id"] == codex_id), None)
+        if src:
+            plan.append((src, folder, short, mode))
+
+    for d in docs_sorted:
+        if d["section"] != "law":
+            continue
+        num = d["id"].split("-")[-1]
+        folder = "law/%s" % num
+        short = "Закон №%s" % num
+        chapters = parse_document(d["text"], "chapter")
+        if len(chapters) >= 2:
+            plan.append((d, folder, short, "chapter"))
+            continue
+        arts = parse_document(d["text"], "article")
+        if len(arts) >= 3 and len({a["key"] for a in arts}) == len(arts):
+            plan.append((d, folder, short, "article"))
+    return plan
+
+
 def generate():
     docs = load_docs()
     validate(docs)
     docs_sorted = sorted(docs, key=sort_key)
     today = date.today().isoformat()
     out = {}
+
+    plan = plan_books(docs_sorted)
+    # относительные пути считаются от docs/, потому что страница документа лежит там
+    book_index = {doc["id"]: "%s/index.html" % folder for doc, folder, _short, _mode in plan}
 
     # чанки
     for fname, secs in CHUNKS:
@@ -644,16 +691,15 @@ def generate():
         for i, d in enumerate(items):
             prev_doc = items[i - 1] if i > 0 else None
             next_doc = items[i + 1] if i + 1 < len(items) else None
-            out["docs/%s.html" % d["id"]] = build_doc_page(d, prev_doc, next_doc)
+            out["docs/%s.html" % d["id"]] = build_doc_page(
+                d, prev_doc, next_doc, book_index.get(d["id"])
+            )
 
     out["docs/index.html"] = build_index_page(docs_sorted)
 
-    # страницы отдельных статей и глав кодексов
+    # страницы статей и глав
     book_paths = []
-    for codex_id, folder, short, mode in CODEBOOKS:
-        src = next((d for d in docs_sorted if d["id"] == codex_id), None)
-        if not src:
-            continue
+    for src, folder, short, mode in plan:
         for path, content in build_code_pages(src, folder, short, mode, docs_sorted).items():
             out[path] = content
             if path.endswith(".html"):
