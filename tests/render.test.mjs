@@ -107,6 +107,14 @@ const fetchStub = (url) => {
   if (name === 'docs.json') {
     return Promise.resolve({ ok: true, json: () => Promise.resolve(JSON.parse(JSON.stringify(docs))) });
   }
+  if (name === 'search-index.json') {
+    const raw = readFileSync(join(root, 'search-index.json'), 'utf8');
+    return Promise.resolve({ ok: true, json: () => Promise.resolve(JSON.parse(raw)) });
+  }
+  if (name === 'uak-articles.json') {
+    const raw = readFileSync(join(root, 'uak-articles.json'), 'utf8');
+    return Promise.resolve({ ok: true, json: () => Promise.resolve(JSON.parse(raw)) });
+  }
   return Promise.resolve({ ok: false, status: 404, json: () => Promise.reject(new Error('no')) });
 };
 
@@ -178,6 +186,44 @@ location.hash = '#appeal-41';
 window._l.hashchange();
 await sleep(30);
 check('открылся appeal-41', sheet.innerHTML.includes('appeal-41.html'), 'нет ссылки на appeal-41');
+
+console.log('— ссылки на статьи в тексте —');
+location.hash = '#codex-2';
+window._l.hashchange();
+await sleep(60);
+const arefs = (sheet.innerHTML.match(/class="aref"/g) || []).length;
+check('в тексте УАК появились ссылки на статьи', arefs > 0, arefs + ' ссылок');
+check('ссылка ведёт на страницу статьи', /href="docs\/uak\/[\d.]+\.html"/.test(sheet.innerHTML));
+
+console.log('— палитра —');
+document._l.keydown({ key: 'k', ctrlKey: true, target: { tagName: 'BODY' }, preventDefault() {} });
+await sleep(120);
+const palette = document.getElementById('palette');
+const palList = document.getElementById('palList');
+const palInput = document.getElementById('palInput');
+check('Ctrl+K открыл палитру', palette.classList.contains('open'));
+check('палитра заполнилась', palList.innerHTML.length > 50, 'длина ' + palList.innerHTML.length);
+check('в палитре есть действия', palList.innerHTML.includes('Действия'));
+
+palInput.value = '12.8';
+palInput.dispatch('input');
+await sleep(40);
+const plainPal = palList.innerHTML.replace(/<[^>]+>/g, '');
+check('поиск по номеру нашёл статью', /Ст\. 12\.8 УАК/.test(plainPal), plainPal.slice(0, 120));
+
+palInput.value = 'жетон';
+palInput.dispatch('input');
+await sleep(40);
+check('поиск по слову нашёл методичку', /method-1[01]/.test(palList.innerHTML) || palList.innerHTML.includes('жетон'),
+  palList.innerHTML.slice(0, 160));
+
+palInput.value = '12.8';
+palInput.dispatch('input');
+await sleep(40);
+palInput.dispatch('keydown', { key: 'Enter', preventDefault() {} });
+await sleep(40);
+check('Enter увёл на страницу статьи', /docs\/uak\/12\.8\.html$/.test(location.href), location.href);
+check('палитра закрылась', !palette.classList.contains('open'));
 
 console.log('');
 console.log(failed === 0 ? 'OK: ' + passed + ' проверок отрисовки пройдено' : failed + ' провалено, ' + passed + ' пройдено');

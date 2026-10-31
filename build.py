@@ -876,6 +876,46 @@ def generate():
     out["docs/index.txt"] = build_text_index(docs_sorted)
     out["docs/map.txt"] = build_map()
 
+    # поисковый индекс для командной палитры: статьи, документы, части подборок
+    idx = []
+    for src, folder, short, mode in plan:
+        for p in parse_document(src["text"], mode):
+            excerpt = p["text"]
+            if mode == "dotted":
+                excerpt = RE_LEAD_NUMBER.sub("", excerpt, count=1)
+            idx.append({
+                "t": part_heading(p, short, mode),
+                "u": "docs/%s/%s.html" % (folder, p["key"]),
+                "d": src["id"],
+                "p": re.sub(r"\s+", " ", excerpt)[:110].strip(),
+            })
+    for d in docs_sorted:
+        idx.append({
+            "t": d["title"],
+            "u": "docs/%s.html" % d["id"],
+            "d": d["id"],
+            "p": re.sub(r"\s+", " ", d["text"])[:110].strip(),
+        })
+    for d in docs_sorted:
+        if d["id"] not in COLLECTIONS:
+            continue
+        folder = "prec/%s" % d["id"]
+        for i, chunk in enumerate(split_chunks(d["text"]), 1):
+            nums = chunk_numbers(chunk, 6)
+            idx.append({
+                "t": "%s — часть %d%s" % (
+                    d["title"], i, (": " + ", ".join("№" + n for n in nums)) if nums else ""
+                ),
+                "u": "docs/%s/%d.html" % (folder, i),
+                "d": d["id"],
+                "p": re.sub(r"\s+", " ", chunk)[:110].strip(),
+            })
+    out["search-index.json"] = json.dumps(idx, ensure_ascii=False, separators=(",", ":"))
+    # номера статей УАК: нужны странице, чтобы делать ссылки в тексте кликабельными
+    uak_nums = sorted({p["key"] for p in parse_document(
+        next(d for d in docs_sorted if d["id"] == "codex-2")["text"], "dotted")})
+    out["uak-articles.json"] = json.dumps(uak_nums, ensure_ascii=False, separators=(",", ":"))
+
     out["sitemap.xml"] = build_sitemap(docs_sorted, today, book_paths)
     out["404.html"] = build_404()
     out["robots.txt"] = "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % SITE

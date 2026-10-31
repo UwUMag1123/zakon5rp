@@ -368,6 +368,106 @@ a:hover{color:var(--accent-2)}
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 body.no-scroll{overflow:hidden}
 
+/* ---------- атмосфера: медленные пятна акцента ---------- */
+
+.aurora{position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; opacity:.85; mix-blend-mode:screen}
+.aurora i{
+  position:absolute; display:block; width:52vw; height:52vw; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, var(--accent), transparent 62%);
+  filter:blur(80px); animation:aurora 26s ease-in-out infinite alternate;
+}
+.aurora i:nth-child(1){top:-18%; left:-8%; opacity:.42}
+.aurora i:nth-child(2){top:24%; right:-16%; width:46vw; height:46vw; opacity:.30; animation-duration:34s; animation-delay:-6s}
+.aurora i:nth-child(3){bottom:-26%; left:22%; width:40vw; height:40vw; opacity:.22; animation-duration:44s; animation-delay:-14s}
+@keyframes aurora{
+  0%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(6vw,-4vh,0) scale(1.16)}
+  100%{transform:translate3d(-5vw,5vh,0) scale(.94)}
+}
+@media (prefers-reduced-motion:reduce){ .aurora i{animation:none} }
+.app{position:relative; z-index:1}
+
+/* ---------- ссылки на статьи внутри текста ---------- */
+
+.aref{
+  color:inherit; text-decoration:none;
+  border-bottom:1px dashed var(--accent); cursor:pointer;
+}
+.aref:hover{color:var(--accent); background:var(--accent-soft)}
+.reftip{
+  position:fixed; z-index:70; max-width:340px; pointer-events:none;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:10px;
+  padding:12px 14px; box-shadow:0 18px 40px rgba(0,0,0,.45);
+  font-family:var(--f-text); font-size:12.5px; line-height:1.55; color:var(--ink-2);
+  opacity:0; transform:translateY(6px); transition:opacity .12s ease, transform .12s ease;
+}
+.reftip.show{opacity:1; transform:none}
+.reftip b{display:block; font-family:var(--f-ui); font-size:12.5px; color:var(--ink); margin-bottom:5px}
+
+/* ---------- командная палитра ---------- */
+
+.pal-backdrop{
+  position:fixed; inset:0; z-index:80; background:rgba(0,0,0,.62);
+  backdrop-filter:blur(4px); display:none;
+}
+.pal-backdrop.open{display:block}
+.palette{
+  position:fixed; z-index:81; left:50%; top:11vh; transform:translateX(-50%) translateY(-8px) scale(.98);
+  width:min(760px,93vw); max-height:74vh; display:none; flex-direction:column;
+  background:var(--surface); border:1px solid var(--line-2); border-radius:16px; overflow:hidden;
+  box-shadow:0 40px 90px rgba(0,0,0,.6);
+}
+.palette.open{display:flex; animation:palIn .16s ease forwards}
+@keyframes palIn{ to{transform:translateX(-50%) translateY(0) scale(1)} }
+.pal-head{display:flex; align-items:center; gap:10px; padding:16px 18px; border-bottom:1px solid var(--line)}
+.pal-head svg{opacity:.5; flex:0 0 auto}
+#palInput{
+  flex:1 1 auto; border:0; background:transparent; outline:0; color:var(--ink);
+  font-family:var(--f-ui); font-size:17px; letter-spacing:-.01em;
+}
+#palInput::placeholder{color:var(--ink-3)}
+.pal-head kbd{
+  font-family:var(--f-mono); font-size:9.5px; color:var(--ink-3);
+  border:1px solid var(--line-2); border-radius:5px; padding:3px 7px;
+}
+.pal-list{overflow-y:auto; padding:8px 8px 10px; flex:1 1 auto}
+.pal-group{
+  font-family:var(--f-mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ink-3); padding:12px 12px 6px;
+}
+.pal-item{
+  display:flex; flex-direction:column; gap:3px; padding:10px 12px; border-radius:9px;
+  cursor:pointer; border-left:2px solid transparent;
+}
+.pal-item:hover{background:var(--surface-2)}
+.pal-item.sel{background:var(--accent-soft); border-left-color:var(--accent)}
+.pal-t{font-family:var(--f-ui); font-size:13.5px; color:var(--ink); line-height:1.35}
+.pal-p{font-family:var(--f-text); font-size:11.5px; color:var(--ink-3); line-height:1.45;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.pal-item mark{background:var(--mark); color:inherit; border-radius:2px}
+.pal-empty{padding:28px 16px; text-align:center; color:var(--ink-3); font-family:var(--f-text); font-size:13.5px}
+.pal-foot{
+  display:flex; gap:16px; padding:10px 18px; border-top:1px solid var(--line);
+  font-family:var(--f-mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
+}
+.pal-foot b{color:var(--ink-2); font-weight:500}
+
+/* ---------- подсказка в рейле ---------- */
+
+.pal-hint{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  margin-top:10px; padding:7px 10px; border:1px solid var(--line); border-radius:7px;
+  background:var(--surface-2); font-family:var(--f-mono); font-size:9.5px;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); cursor:pointer;
+}
+.pal-hint:hover{border-color:var(--accent); color:var(--accent)}
+.pal-hint kbd{border:1px solid var(--line-2); border-radius:4px; padding:1px 5px; font-family:inherit}
+
+/* ---------- 3D-наклон ---------- */
+
+.tilt{transform-style:preserve-3d; transition:transform .25s ease}
+@media (prefers-reduced-motion:reduce){ .tilt{transition:none} }
+
 /* ---------- мобильные ---------- */
 
 @media (max-width:860px){
@@ -383,6 +483,7 @@ body.no-scroll{overflow:hidden}
   .stats{grid-template-columns:repeat(auto-fit,minmax(96px,1fr))}
 }
 </style>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=PT+Serif:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
 
 <div class="app">
@@ -399,6 +500,9 @@ body.no-scroll{overflow:hidden}
         <kbd id="searchKbd" aria-hidden="true">/</kbd>
       </div>
       <div class="hitcount" id="hitcount" aria-live="polite"></div>
+      <button class="pal-hint" id="palHint" type="button">
+        <span>Быстрый переход по базе</span><kbd>Ctrl K</kbd>
+      </button>
     </div>
     <div class="rail-list" id="railList"></div>
     <div class="rail-foot">
@@ -464,6 +568,22 @@ body.no-scroll{overflow:hidden}
 </aside>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="reftip" id="refTip" role="tooltip" aria-hidden="true"></div>
+
+<div class="pal-backdrop" id="palBackdrop"></div>
+<div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Быстрый переход">
+  <div class="pal-head">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="palInput" type="text" placeholder="Статья, документ или действие…" autocomplete="off" spellcheck="false" aria-label="Быстрый переход по базе">
+    <kbd>esc</kbd>
+  </div>
+  <div class="pal-list" id="palList"></div>
+  <div class="pal-foot">
+    <span><b>↑↓</b> выбор</span>
+    <span><b>↵</b> открыть</span>
+    <span><b>esc</b> закрыть</span>
+  </div>
+</div>
 
 <noscript>
   <div style="max-width:760px;margin:40px auto;padding:0 18px;font-family:Arial,sans-serif;color:#201c14;background:#f3efe6">
@@ -686,12 +806,12 @@ body.no-scroll{overflow:hidden}
 
   /* ---------- карточка документа ---------- */
 
-  function renderDoc(d, q){
+  function renderDoc(d, q, silent){
     current = d;
     hitIndex = -1;
     hitMarks = [];
     var pattern = q ? buildPattern(q) : null;
-    var body = highlight(d.text, pattern);
+    var body = linkify(highlight(d.text, pattern));
     var hitBar = q ? '<div id="hitNav" style="margin:0 0 12px"></div>' : '';
     var st = statusOf(d);
     var dt = dateOf(d);
@@ -713,11 +833,24 @@ body.no-scroll{overflow:hidden}
       + (st === 'void' ? '<span class="status-tag void">утратил силу</span>'
          : st === 'pending' ? '<span class="status-tag">на рассмотрении</span>' : '')
       + '<span class="tools">'
+      + '<button class="tool" id="aiPackBtn">Пакет для ИИ</button>'
       + '<a class="tool" href="docs/' + encodeURIComponent(d.id) + '.html" target="_blank" rel="noopener">Постоянная ссылка</a>'
       + '<button class="tool" id="copyDocBtn">Копировать</button>'
       + '</span></div>'
       + hitBar
       + '<div class="doc-body">' + body + '</div>';
+
+    var packBtn = document.getElementById('aiPackBtn');
+    if(packBtn) packBtn.addEventListener('click', copyPack);
+    pushRecent(d.id);
+    if(sheet && sheet.animate && !silent){
+      try{
+        sheet.animate(
+          [{opacity: .55, transform: 'translateY(5px)'}, {opacity: 1, transform: 'none'}],
+          {duration: 200, easing: 'ease-out'}
+        );
+      }catch(e){}
+    }
 
     document.getElementById('copyDocBtn').addEventListener('click', function(){
       copyText(d.title + '\n\n' + d.text, 'Текст документа скопирован');
@@ -805,6 +938,18 @@ body.no-scroll{overflow:hidden}
   document.addEventListener('keydown', function(e){
     var tag = (e.target && e.target.tagName) || '';
     var inField = tag === 'INPUT' || tag === 'TEXTAREA';
+
+    if((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')){
+      e.preventDefault();
+      if(palEl && palEl.classList.contains('open')) closePalette();
+      else openPalette();
+      return;
+    }
+    if(e.key === 'Escape' && palEl && palEl.classList.contains('open')){
+      e.preventDefault();
+      closePalette();
+      return;
+    }
 
     if(e.key === '/' && !inField && !e.ctrlKey && !e.metaKey && !e.altKey){
       e.preventDefault();
@@ -1057,6 +1202,278 @@ body.no-scroll{overflow:hidden}
     if(savedTheme) setTheme(savedTheme);
   }catch(e){}
 
+  /* ---------- индекс статей и палитра ---------- */
+
+  var IDX = [];            // все статьи и документы, приходит из search-index.json
+  var IDX_READY = false;
+  var IDX_WAIT = null;
+  var UAK_SET = null;      // номера статей УАК, чтобы делать ссылки в тексте
+
+  function loadIndex(){
+    if(IDX_WAIT) return IDX_WAIT;
+    IDX_WAIT = fetch('search-index.json')
+      .then(function(r){ return r.json(); })
+      .then(function(data){ IDX = data || []; IDX_READY = true; return IDX; })
+      .catch(function(){ IDX_READY = true; return IDX; });
+    return IDX_WAIT;
+  }
+  function loadUak(){
+    fetch('uak-articles.json')
+      .then(function(r){ return r.json(); })
+      .then(function(list){
+        UAK_SET = {};
+        (list || []).forEach(function(n){ UAK_SET[n] = 1; });
+        if(current) renderDoc(current, searchInput.value.trim(), true);
+      })
+      .catch(function(){});
+  }
+
+  /* ---------- ссылки на статьи внутри текста ---------- */
+
+  var RE_ART_REF = /(ст\.|стать[яеиюё]|статьях|статьям|статьями|статьей|статьёй|статей)\s*(\d{1,2}(?:\.\d{1,2}){1,2})(?![\d.])/gi;
+
+  function linkify(html){
+    if(!UAK_SET) return html;
+    return html.replace(RE_ART_REF, function(m, pre, num){
+      if(!UAK_SET[num]) return m;
+      return pre + ' <a class="aref" href="docs/uak/' + num + '.html" target="_blank" rel="noopener" data-num="' + num + '">' + num + '</a>';
+    });
+  }
+
+  var refTip = document.getElementById('refTip');
+  function showRefTip(a){
+    if(!refTip || !IDX_READY) return;
+    var num = a.getAttribute('data-num');
+    var hit = null;
+    for(var i = 0; i < IDX.length; i++){
+      if(IDX[i].u === 'docs/uak/' + num + '.html'){ hit = IDX[i]; break; }
+    }
+    if(!hit){ return; }
+    refTip.innerHTML = '<b>' + escapeHtml(hit.t) + '</b>' + escapeHtml(hit.p);
+    var r = a.getBoundingClientRect();
+    refTip.style.left = Math.max(12, Math.min(window.innerWidth - 360, r.left)) + 'px';
+    refTip.style.top = (r.bottom + 10) + 'px';
+    refTip.classList.add('show');
+    refTip.setAttribute('aria-hidden', 'false');
+  }
+  function hideRefTip(){
+    if(!refTip) return;
+    refTip.classList.remove('show');
+    refTip.setAttribute('aria-hidden', 'true');
+  }
+  if(sheet && sheet.addEventListener){
+    sheet.addEventListener('mouseover', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('.aref') : null;
+      if(a) showRefTip(a);
+    });
+    sheet.addEventListener('mouseout', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('.aref') : null;
+      if(a) hideRefTip();
+    });
+  }
+
+  /* ---------- недавние ---------- */
+
+  function recents(){
+    try{
+      var arr = JSON.parse(localStorage.getItem('murrieta_recent') || '[]');
+      return arr.map(function(id){
+        var d = byId[id];
+        return d ? {t: d.title, p: SECTION_LABEL[d.section], id: id} : null;
+      }).filter(Boolean);
+    }catch(e){ return []; }
+  }
+  function pushRecent(id){
+    try{
+      var arr = JSON.parse(localStorage.getItem('murrieta_recent') || '[]');
+      arr = arr.filter(function(x){ return x !== id; });
+      arr.unshift(id);
+      localStorage.setItem('murrieta_recent', JSON.stringify(arr.slice(0, 8)));
+    }catch(e){}
+  }
+
+  /* ---------- пакет для ИИ ---------- */
+
+  function copyPack(){
+    if(!current){ toast('Сначала откройте документ'); return; }
+    var pack = promptBox.value + '\n\n---\n\nДОКУМЕНТ: ' + current.title +
+      '\n' + location.href.replace(/#.*$/, '') + 'docs/' + current.id + '.html\n\n' + current.text;
+    copyText(pack, 'Пакет для ИИ скопирован');
+  }
+
+  function cycleTheme(){
+    var cur = document.documentElement.getAttribute('data-theme') || 'system';
+    setTheme(cur === 'system' ? 'light' : cur === 'light' ? 'dark' : 'system');
+    toast('Тема: ' + (cur === 'system' ? 'светлая' : cur === 'light' ? 'тёмная' : 'системная'));
+  }
+
+  /* ---------- палитра ---------- */
+
+  var palEl = document.getElementById('palette');
+  var palBackdrop = document.getElementById('palBackdrop');
+  var palInput = document.getElementById('palInput');
+  var palListEl = document.getElementById('palList');
+  var palItems = [];
+  var palSel = 0;
+
+  function palActions(){
+    var acts = [
+      {t: 'Открыть промпт для ИИ', p: 'системный промпт с правилами', act: 'prompt'},
+      {t: 'Сменить тему', p: 'светлая, тёмная, системная', act: 'theme'},
+      {t: 'Оглавление базы', p: 'все документы списком', u: 'docs/index.html'},
+      {t: 'Статьи УАК', p: 'оглавление кодекса по главам', u: 'docs/uak/index.html'},
+      {t: 'Методички по темам', p: 'видеофиксация, Миранда, жетоны', u: 'docs/method-nav.html'},
+      {t: 'Решения и толкования по номерам', p: 'например №541', u: 'docs/appeal-nav.html'}
+    ];
+    if(current) acts.unshift({t: 'Скопировать пакет для ИИ', p: current.title, act: 'pack'});
+    return acts;
+  }
+
+  function palSearch(q){
+    var query = (q || '').trim().toLowerCase();
+    var out = [];
+    var acts = palActions().filter(function(a){
+      return !query || (a.t + ' ' + (a.p || '')).toLowerCase().indexOf(query) >= 0;
+    });
+    if(acts.length) out.push({g: 'Действия', items: acts});
+
+    if(!query){
+      var rec = recents();
+      if(rec.length) out.push({g: 'Недавние', items: rec});
+      out.push({g: 'Документы', items: DOCS.slice(0, 8).map(function(d){
+        return {t: d.title, p: SECTION_LABEL[d.section], id: d.id};
+      })});
+      return out;
+    }
+
+    var numExact = /^\d{1,2}(?:\.\d{1,2}){1,2}$/.test(query);
+    var hits = [];
+    for(var i = 0; i < IDX.length; i++){
+      var e = IDX[i];
+      var tLow = e.t.toLowerCase();
+      var inT = tLow.indexOf(query);
+      var inP = e.p ? e.p.toLowerCase().indexOf(query) : -1;
+      if(inT < 0 && inP < 0) continue;
+      var score = 3;
+      if(numExact && tLow.indexOf('ст. ' + query) === 0) score = 0;
+      else if(inT === 0) score = 1;
+      else if(inT > 0) score = 2;
+      hits.push({e: e, s: score});
+    }
+    hits.sort(function(a, b){ return a.s - b.s; });
+
+    var isArt = function(e){ return /^docs\/(uak|konst|trud|pk|sud|dor)\//.test(e.u); };
+    var isDoc = function(e){ return /^docs\/[a-z0-9-]+\.html$/.test(e.u) && !isArt(e); };
+    var arts = hits.filter(function(h){ return isArt(h.e); }).slice(0, 18).map(function(h){ return h.e; });
+    var docsHits = hits.filter(function(h){ return isDoc(h.e); }).slice(0, 8).map(function(h){ return h.e; });
+    var rest = hits.filter(function(h){ return arts.indexOf(h.e) < 0 && docsHits.indexOf(h.e) < 0; }).slice(0, 10).map(function(h){ return h.e; });
+
+    if(arts.length) out.push({g: 'Статьи', items: arts});
+    if(docsHits.length) out.push({g: 'Документы', items: docsHits});
+    if(rest.length) out.push({g: 'Ещё', items: rest});
+    return out;
+  }
+
+  function palRender(){
+    if(!palListEl) return;
+    var q = palInput ? palInput.value : '';
+    var groups = palSearch(q);
+    var pattern = q.trim() ? buildPattern(q) : null;
+    var html = '';
+    palItems = [];
+    groups.forEach(function(g){
+      if(!g.items || !g.items.length) return;
+      if(g.g) html += '<div class="pal-group">' + escapeHtml(g.g) + '</div>';
+      g.items.forEach(function(it){
+        var i = palItems.length;
+        palItems.push(it);
+        var title = pattern ? highlight(it.t, pattern) : escapeHtml(it.t);
+        var sub = it.p ? '<span class="pal-p">' + escapeHtml(it.p) + '</span>' : '';
+        html += '<div class="pal-item' + (i === palSel ? ' sel' : '') + '" data-i="' + i + '">'
+              + '<span class="pal-t">' + title + '</span>' + sub + '</div>';
+      });
+    });
+    palListEl.innerHTML = html || '<div class="pal-empty">Ничего не нашлось. Попробуйте номер статьи: 12.8, 17.6, 3.7.2</div>';
+    Array.prototype.forEach.call(palListEl.querySelectorAll('.pal-item'), function(el){
+      el.addEventListener('click', function(){
+        var i = parseInt(el.getAttribute('data-i'), 10);
+        palRun(palItems[i]);
+      });
+      el.addEventListener('mouseenter', function(){
+        palSel = parseInt(el.getAttribute('data-i'), 10);
+        Array.prototype.forEach.call(palListEl.querySelectorAll('.pal-item'), function(x){ x.classList.remove('sel'); });
+        el.classList.add('sel');
+      });
+    });
+  }
+
+  function palRun(it){
+    if(!it) return;
+    closePalette();
+    if(it.act === 'prompt'){ openDrawer(); return; }
+    if(it.act === 'pack'){ copyPack(); return; }
+    if(it.act === 'theme'){ cycleTheme(); return; }
+    if(it.id){ location.hash = it.id; return; }
+    if(it.u){ location.href = it.u; }
+  }
+
+  function openPalette(){
+    if(!palEl) return;
+    loadIndex().then(function(){
+      palSel = 0;
+      if(palInput) palInput.value = '';
+      palRender();
+      palEl.classList.add('open');
+      palBackdrop.classList.add('open');
+      palEl.setAttribute('aria-hidden', 'false');
+      if(palInput) palInput.focus();
+    });
+  }
+  function closePalette(){
+    if(!palEl) return;
+    palEl.classList.remove('open');
+    palBackdrop.classList.remove('open');
+    palEl.setAttribute('aria-hidden', 'true');
+  }
+  function palMove(d){
+    if(!palItems.length) return;
+    palSel = (palSel + d + palItems.length) % palItems.length;
+    palRender();
+    var sel = palListEl.querySelector('.pal-item.sel');
+    if(sel && sel.scrollIntoView) sel.scrollIntoView({block: 'nearest'});
+  }
+
+  if(palInput){
+    palInput.addEventListener('input', function(){ palSel = 0; palRender(); });
+    palInput.addEventListener('keydown', function(e){
+      if(e.key === 'ArrowDown'){ e.preventDefault(); palMove(1); }
+      else if(e.key === 'ArrowUp'){ e.preventDefault(); palMove(-1); }
+      else if(e.key === 'Enter'){ e.preventDefault(); palRun(palItems[palSel]); }
+      else if(e.key === 'Escape'){ e.preventDefault(); closePalette(); }
+    });
+  }
+  if(palBackdrop) palBackdrop.addEventListener('click', closePalette);
+  var palHint = document.getElementById('palHint');
+  if(palHint) palHint.addEventListener('click', openPalette);
+
+  /* ---------- наклон карточек ---------- */
+
+  function tiltInit(){
+    if(!sheet || !sheet.addEventListener) return;
+    sheet.addEventListener('mousemove', function(e){
+      if(!e.target || !e.target.closest) return;
+      var card = e.target.closest('.stats > div');
+      if(!card) return;
+      var r = card.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = 'perspective(700px) rotateX(' + (-py * 7).toFixed(1) + 'deg) rotateY(' + (px * 9).toFixed(1) + 'deg)';
+    });
+    sheet.addEventListener('mouseleave', function(){
+      Array.prototype.forEach.call(sheet.querySelectorAll('.stats > div'), function(el){ el.style.transform = ''; });
+    });
+  }
+
   /* ---------- загрузка ---------- */
   function boot(data){
     DOCS = data.slice().sort(function(a, b){
@@ -1080,6 +1497,14 @@ body.no-scroll{overflow:hidden}
 
   renderEmpty();
   loadPrompt();
+  loadUak();
+  tiltInit();
+  // индекс для палитры грузим в простое, чтобы не тормозить первый экран
+  if(window.requestIdleCallback){
+    window.requestIdleCallback(function(){ loadIndex(); }, {timeout: 2500});
+  } else {
+    setTimeout(function(){ loadIndex(); }, 1500);
+  }
 
   fetch('docs.json', {cache: 'no-cache'})
     .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
